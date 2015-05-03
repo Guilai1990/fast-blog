@@ -25,6 +25,7 @@ public class WebApplication {
     protected static class ApplicationSecurity extends WebSecurityConfigurerAdapter {
         @Override
         public void configure(WebSecurity web) throws Exception {
+            // don't subject favicon and static assets to security controls
             web
                     .ignoring()
                     .antMatchers("/resources/**");
@@ -32,6 +33,7 @@ public class WebApplication {
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
+            /* GET / can be viewed by anyone. everything else requires HTTP basic auth */
             http.authorizeRequests()
                     .antMatchers("/").permitAll()
                     .anyRequest().authenticated().and().httpBasic();
