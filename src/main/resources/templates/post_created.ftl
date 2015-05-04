@@ -16,11 +16,7 @@
 <body>
 <h1>Post Created</h1>
 
-<p>Here is what the body will be:</p>
-
-<pre>
-${body}
-</pre>
+<p>Don't you feel good about yourself?</p>
 
 </body>
 </html>
