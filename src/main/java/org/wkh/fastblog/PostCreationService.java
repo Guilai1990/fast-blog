@@ -3,11 +3,8 @@ package org.wkh.fastblog;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -22,18 +19,16 @@ import java.util.concurrent.Future;
 @Component
 @ConfigurationProperties(prefix="kafka.topics")
 public class PostCreationService implements InitializingBean {
-    private final Logger log = LoggerFactory.getLogger(KafkaProducerSingleton.class);
-
     @NotNull
     private String postsTopic;
 
     private final String schemaPath = "post_schema.json";
 
-    private final KafkaProducerSingleton kafkaService;
+    private final KafkaService kafkaService;
     private final Schema schema;
 
     @Autowired
-    public PostCreationService(KafkaProducerSingleton kafkaService) throws Exception {
+    public PostCreationService(KafkaService kafkaService) throws Exception {
         this.kafkaService = kafkaService;
 
         final Schema.Parser parser = new Schema.Parser();
@@ -56,15 +51,13 @@ public class PostCreationService implements InitializingBean {
         postRecord.put("body", body);
         postRecord.put("slug", "wip-placeholder");
 
-        ProducerRecord<String, GenericRecord> data = new ProducerRecord<String, GenericRecord>(
+        ProducerRecord<String, GenericRecord> record = new ProducerRecord<String, GenericRecord>(
                 postsTopic,
                 id,
                 postRecord
         );
 
-        Producer<String, GenericRecord> producer = kafkaService.getProducer();
-
-        return producer.send(data);
+        return kafkaService.sendRecord(record);
     }
 
     @Override

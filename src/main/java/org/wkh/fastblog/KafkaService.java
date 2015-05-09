@@ -1,23 +1,18 @@
 package org.wkh.fastblog;
 
 import org.apache.avro.generic.GenericRecord;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.kafka.clients.producer.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
 import java.util.Properties;
+import java.util.concurrent.Future;
 
-@Component
+@Service
 @ConfigurationProperties(prefix="kafka")
-public class KafkaProducerSingleton implements InitializingBean {
-    private final Logger log = LoggerFactory.getLogger(KafkaProducerSingleton.class);
-
+public class KafkaService implements InitializingBean {
     @NotNull
     private String zookeeper;
 
@@ -62,10 +57,6 @@ public class KafkaProducerSingleton implements InitializingBean {
         this.brokerList = brokerList;
     }
 
-    public Producer<String, GenericRecord> getProducer() {
-       return producer;
-    }
-
     @Override
     public void afterPropertiesSet() throws Exception {
         Properties props = new Properties();
@@ -83,5 +74,9 @@ public class KafkaProducerSingleton implements InitializingBean {
         props.put("bootstrap.servers", brokerList);
 
         producer = new KafkaProducer<String, GenericRecord>(props);
+    }
+
+    public Future<RecordMetadata> sendRecord(ProducerRecord<String, GenericRecord> record) {
+        return producer.send(record);
     }
 }
