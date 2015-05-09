@@ -6,11 +6,19 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
+@Component
+@ConfigurationProperties(prefix="kafka.topics")
 public class PostCreationService {
+    @NotNull
+    private static String postsTopic;
+
     public static final String schemaString = "{\"namespace\": \"org.wkh.fastblog\", \"type\": \"record\", " +
             "\"name\": \"post\"," +
             "\"fields\": [" +
@@ -22,6 +30,10 @@ public class PostCreationService {
     private static final Schema.Parser parser = new Schema.Parser();
     private static final Schema schema = parser.parse(schemaString);
 
+    public static void setPostsTopic(String postsTopic) {
+        PostCreationService.postsTopic = postsTopic;
+    }
+
     public static Future<RecordMetadata> create(String body) {
         String id = UUID.randomUUID().toString();
 
@@ -30,7 +42,7 @@ public class PostCreationService {
         postRecord.put("body", body);
 
         ProducerRecord<String, GenericRecord> data = new ProducerRecord<String, GenericRecord>(
-                "posts",
+                postsTopic,
                 id,
                 postRecord
         );
