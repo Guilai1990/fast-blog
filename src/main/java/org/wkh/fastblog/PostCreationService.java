@@ -10,6 +10,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
@@ -19,16 +22,20 @@ public class PostCreationService {
     @NotNull
     private static String postsTopic;
 
-    public static final String schemaString = "{\"namespace\": \"org.wkh.fastblog\", \"type\": \"record\", " +
-            "\"name\": \"post\"," +
-            "\"fields\": [" +
-            "{\"name\": \"id\", \"type\": \"string\"}," +
-            "{\"name\": \"body\", \"type\": \"string\"}" +
-            "]}";
+    public static final String schemaPath = "post_schema.json";
 
     private static final Producer<String, GenericRecord> producer = KafkaProducerSingleton.getProducer();
     private static final Schema.Parser parser = new Schema.Parser();
-    private static final Schema schema = parser.parse(schemaString);
+    private static Schema schema;
+
+    static {
+        try {
+            InputStream schemaStream = PostCreationService.class.getClassLoader().getResourceAsStream(schemaPath);
+            schema = parser.parse(schemaStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void setPostsTopic(String postsTopic) {
         PostCreationService.postsTopic = postsTopic;

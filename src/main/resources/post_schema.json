@@ -1,0 +1,9 @@
+{
+  "namespace": "org.wkh.fastblog",
+  "type": "record",
+  "name": "post",
+  "fields": [
+    {"name": "id", "type": "string"},
+    {"name": "body", "type": "string"}
+  ]
+}
