@@ -2,9 +2,11 @@ package org.wkh.fastblog;
 
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -20,6 +22,13 @@ import java.util.concurrent.Future;
 public class PostsController implements ApplicationContextAware {
     private static final String SECURITY_PROPERTIES = "securityProperties";
     private String adminUsername;
+
+    private final PostCreationService postCreationService;
+
+    @Autowired
+    public PostsController(PostCreationService postCreationService) {
+        this.postCreationService = postCreationService;
+    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -61,9 +70,9 @@ public class PostsController implements ApplicationContextAware {
     @RequestMapping(value = "/posts/create", method = RequestMethod.POST)
     public String createPost(@RequestParam(value = "body", required = true) String body,
                              final RedirectAttributes redirectAttributes) {
-        PostCreationService.create(body);
+        Future<RecordMetadata> result = postCreationService.create(body);
 
-        redirectAttributes.addFlashAttribute("post_created", "Post created!");
+        redirectAttributes.addFlashAttribute("post_creation_succeeded", result != null);
 
         return "redirect:/posts/new";
     }

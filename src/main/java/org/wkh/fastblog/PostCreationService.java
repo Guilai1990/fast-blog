@@ -6,12 +6,14 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.UUID;
@@ -19,30 +21,31 @@ import java.util.concurrent.Future;
 
 @Component
 @ConfigurationProperties(prefix="kafka.topics")
-public class PostCreationService {
+public class PostCreationService implements InitializingBean {
+    private final Logger log = LoggerFactory.getLogger(KafkaProducerSingleton.class);
+
     @NotNull
-    private static String postsTopic;
+    private String postsTopic;
 
-    public static final String schemaPath = "post_schema.json";
+    private final String schemaPath = "post_schema.json";
 
-    private static final Producer<String, GenericRecord> producer = KafkaProducerSingleton.getProducer();
-    private static final Schema.Parser parser = new Schema.Parser();
-    private static Schema schema;
+    private final KafkaProducerSingleton kafkaService;
+    private final Schema schema;
 
-    static {
-        try {
-            InputStream schemaStream = PostCreationService.class.getClassLoader().getResourceAsStream(schemaPath);
-            schema = parser.parse(schemaStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @Autowired
+    public PostCreationService(KafkaProducerSingleton kafkaService) throws Exception {
+        this.kafkaService = kafkaService;
+
+        final Schema.Parser parser = new Schema.Parser();
+        InputStream schemaStream = PostCreationService.class.getClassLoader().getResourceAsStream(schemaPath);
+        schema = parser.parse(schemaStream);
     }
 
-    public static void setPostsTopic(String postsTopic) {
-        PostCreationService.postsTopic = postsTopic;
+    public void setPostsTopic(String postsTopic) {
+        this.postsTopic = postsTopic;
     }
 
-    public static Future<RecordMetadata> create(String body) {
+    public Future<RecordMetadata> create(String body) {
         String id = UUID.randomUUID().toString();
 
         GenericRecord postRecord = new GenericData.Record(schema);
@@ -59,6 +62,13 @@ public class PostCreationService {
                 postRecord
         );
 
+        Producer<String, GenericRecord> producer = kafkaService.getProducer();
+
         return producer.send(data);
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        
     }
 }
