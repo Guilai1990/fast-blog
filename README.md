@@ -24,13 +24,22 @@ The "ES" in the script file name refers to "[event sourced](http://martinfowler.
 Edit `application.properties` with any custom Kafka configuration values you have.
 If you're just using the out of the box defaults, you shouldn't need to edit anything.
 
-Then run the JAR:
+You'll need [Maven](https://maven.apache.org/) installed. Then you can build the project like so:
+
+```
+$ mvn clean package
+```
+
+Then (assuming the build succeeds) run the JAR it creates:
 
 ```
 java -jar target/fast-blog-1.0-SNAPSHOT.jar --security.user.password=your-password
 ```
 
-Go to `http://localhost:8080/posts/new` and try making a post. The default
+The build is set up to build a single, fat JAR. This JAR contains all the dependencies for the project, including an 
+embedded [Tomcat](http://tomcat.apache.org/) instance! :)
+
+Go to `http://localhost:8080/posts/new` and try making a post. You'll be prompted to authenticate. The default
 username is set to be `admin`. The password is whatever you provided at the
 command line with `security.user.password`. Running a `kafka-avro-console-consumer`
 the way the quickstart indicates should show posts as they're created.
