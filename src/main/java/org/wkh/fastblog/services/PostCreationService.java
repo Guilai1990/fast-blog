@@ -23,7 +23,6 @@ public class PostCreationService {
     public PostCreationService(KafkaService kafkaService, PostSchemaService postSchemaService) throws Exception {
         this.kafkaService = kafkaService;
         this.postSchemaService = postSchemaService;
-
     }
 
     public void setPostsTopic(String postsTopic) {
