@@ -21,11 +21,18 @@ $ bin/create-es-topic.sh posts
 
 The "ES" in the script file name refers to "[event sourced](http://martinfowler.com/eaaDev/EventSourcing.html)".
 
+Edit `application.properties` with any custom Kafka configuration values you have.
+If you're just using the out of the box defaults, you shouldn't need to edit anything.
+
 Then run the JAR:
 
 ```
-java -jar target/fast-blog-1.0-SNAPSHOT.jar
+java -jar target/fast-blog-1.0-SNAPSHOT.jar --security.user.password=your-password
 ```
 
-Go to `http://localhost:8080/posts/new` and try making a post. Running a `kafka-avro-console-consumer` the way the 
-quickstart indicates should show posts as they're created.
+Go to `http://localhost:8080/posts/new` and try making a post. The default
+username is set to be `admin`. The password is whatever you provided at the
+command line with `security.user.password`. Running a `kafka-avro-console-consumer`
+the way the quickstart indicates should show posts as they're created.
+
+The `bin` directory has helper scripts you may find useful.

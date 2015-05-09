@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.concurrent.Future;
 
@@ -52,16 +53,19 @@ public class PostsController implements ApplicationContextAware {
         return username.equals(adminUsername);
     }
 
-    @RequestMapping("/posts/new")
+    @RequestMapping(value = "/posts/new", method = RequestMethod.GET)
     public String createPostView() {
         return "edit_new_post";
     }
 
     @RequestMapping(value = "/posts/create", method = RequestMethod.POST)
-    public String createPost(@RequestParam(value = "body", required = true) String body, Model model) {
+    public String createPost(@RequestParam(value = "body", required = true) String body,
+                             final RedirectAttributes redirectAttributes) {
         PostCreationService.create(body);
 
-        return "post_created";
+        redirectAttributes.addFlashAttribute("post_created", "Post created!");
+
+        return "redirect:/posts/new";
     }
 
 }

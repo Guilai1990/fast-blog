@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
@@ -45,8 +46,12 @@ public class PostCreationService {
         String id = UUID.randomUUID().toString();
 
         GenericRecord postRecord = new GenericData.Record(schema);
+
         postRecord.put("id", id);
+        postRecord.put("created_at", new Date().getTime());
+        postRecord.put("title", "WIP placeholder");
         postRecord.put("body", body);
+        postRecord.put("slug", "wip-placeholder");
 
         ProducerRecord<String, GenericRecord> data = new ProducerRecord<String, GenericRecord>(
                 postsTopic,

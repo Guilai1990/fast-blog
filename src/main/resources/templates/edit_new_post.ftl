@@ -16,6 +16,10 @@
     <body>
         <h1>New Post</h1>
 
+        <#if post_created??>
+            <p class="bg-success">${post_created}</p>
+        </#if>
+
         <form action="/posts/create" method="post">
             <div class="form-group">
                 <textarea name="body" cols="120" rows="30"></textarea>

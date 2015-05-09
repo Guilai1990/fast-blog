@@ -4,6 +4,9 @@
   "name": "post",
   "fields": [
     {"name": "id", "type": "string"},
-    {"name": "body", "type": "string"}
+    {"name": "created_at", "type": "long"},
+    {"name": "title", "type": "string"},
+    {"name": "body", "type": "string"},
+    {"name": "slug", "type": "string"}
   ]
 }
