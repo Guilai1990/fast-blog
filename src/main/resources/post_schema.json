@@ -5,8 +5,11 @@
   "fields": [
     {"name": "id", "type": "string"},
     {"name": "created_at", "type": "long"},
+    {"name": "published", "type": "boolean"},
+    {"name": "published_at", "type": ["null", "long"]},
     {"name": "title", "type": "string"},
     {"name": "body", "type": "string"},
+    {"name": "summary", "type": "string"},
     {"name": "slug", "type": "string"}
   ]
 }

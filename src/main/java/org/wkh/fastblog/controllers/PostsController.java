@@ -1,4 +1,4 @@
-package org.wkh.fastblog;
+package org.wkh.fastblog.controllers;
 
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.beans.BeansException;
@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.wkh.fastblog.domain.Post;
+import org.wkh.fastblog.services.PostCreationService;
 
 import java.util.concurrent.Future;
 
@@ -68,8 +70,12 @@ public class PostsController implements ApplicationContextAware {
 
     @RequestMapping(value = "/posts/create", method = RequestMethod.POST)
     public String createPost(@RequestParam(value = "body", required = true) String body,
+                             @RequestParam(value = "title", required = true) String title,
+                             @RequestParam(value = "summary") String summary,
                              final RedirectAttributes redirectAttributes) {
-        Future<RecordMetadata> result = postCreationService.create(body);
+        Post post = new Post(title, body, summary);
+
+        Future<RecordMetadata> result = postCreationService.create(post);
 
         redirectAttributes.addFlashAttribute("post_creation_succeeded", result != null);
 

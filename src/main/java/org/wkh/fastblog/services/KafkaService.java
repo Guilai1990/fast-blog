@@ -1,4 +1,4 @@
-package org.wkh.fastblog;
+package org.wkh.fastblog.services;
 
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.*;
