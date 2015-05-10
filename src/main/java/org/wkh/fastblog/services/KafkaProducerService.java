@@ -20,9 +20,6 @@ public class KafkaProducerService implements InitializingBean {
     private String groupId;
 
     @NotNull
-    private boolean autoCommit;
-
-    @NotNull
     private String producerReset;
 
     @NotNull
@@ -39,10 +36,6 @@ public class KafkaProducerService implements InitializingBean {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
-    }
-
-    public void setAutoCommit(boolean autoCommit) {
-        this.autoCommit = autoCommit;
     }
 
     public void setProducerReset(String producerReset) {
@@ -68,7 +61,6 @@ public class KafkaProducerService implements InitializingBean {
 
         props.put("zookeeper.connect", zookeeper);
         props.put("group.id", groupId);
-        props.put("auto.commit.enable", autoCommit);
         props.put("auto.offset.reset", producerReset);
         props.put("schema.registry.url", schemaRegistry);
         props.put("bootstrap.servers", brokerList);

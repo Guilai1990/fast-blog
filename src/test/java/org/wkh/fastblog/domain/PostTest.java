@@ -22,5 +22,9 @@ public class PostTest {
 
         assertEquals(post.getId(), record.get("id"));
         assertEquals(now + "-post-title-1-part-2", record.get("slug"));
+
+        Post reconstructedPost = Post.fromRecord(record);
+
+        assertEquals(reconstructedPost, post);
     }
 }

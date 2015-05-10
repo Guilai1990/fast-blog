@@ -1,3 +1,23 @@
+/* Originally written by Confluent: https://github.com/confluentinc/examples/blob/master/consumer/src/main/java/io/confluent/examples/consumer/ConsumerGroupExample.java
+Original license follows
+ */
+
+/**
+ * Copyright 2015 Confluent Inc.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.wkh.fastblog.services;
 
 import io.confluent.kafka.serializers.KafkaAvroDecoder;
@@ -30,9 +50,6 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
 
     @NotNull
     private String groupId;
-
-    @NotNull
-    private String autoCommit;
 
     @NotNull
     private String consumerReset;
@@ -68,7 +85,6 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
         Properties props = new Properties();
         props.put("zookeeper.connect", zookeeper);
         props.put("group.id", groupId);
-        props.put("auto.commit.enable", autoCommit);
         props.put("auto.offset.reset", consumerReset);
         props.put("schema.registry.url", schemaRegistry);
 
@@ -92,11 +108,9 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
         // Launch all the threads
         executor = Executors.newFixedThreadPool(threadCount);
 
-        // Create ConsumerLogic objects and bind them to threads
-        int threadNumber = 0;
+        // Create PostConsumerThread objects and bind them to threads
         for (final KafkaStream stream : streams) {
-            executor.submit(new ConsumerLogic(stream, threadNumber));
-            threadNumber++;
+            executor.submit(new PostConsumerThread(stream));
         }
     }
 
@@ -121,10 +135,6 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
-    }
-
-    public void setAutoCommit(String autoCommit) {
-        this.autoCommit = autoCommit;
     }
 
     public void setConsumerReset(String consumerReset) {
