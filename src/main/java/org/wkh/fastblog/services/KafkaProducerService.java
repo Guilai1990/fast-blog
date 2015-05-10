@@ -12,7 +12,7 @@ import java.util.concurrent.Future;
 
 @Service
 @ConfigurationProperties(prefix="kafka")
-public class KafkaService implements InitializingBean {
+public class KafkaProducerService implements InitializingBean {
     @NotNull
     private String zookeeper;
 
@@ -23,7 +23,7 @@ public class KafkaService implements InitializingBean {
     private boolean autoCommit;
 
     @NotNull
-    private String reset;
+    private String producerReset;
 
     @NotNull
     private String schemaRegistry;
@@ -45,8 +45,8 @@ public class KafkaService implements InitializingBean {
         this.autoCommit = autoCommit;
     }
 
-    public void setReset(String reset) {
-        this.reset = reset;
+    public void setProducerReset(String producerReset) {
+        this.producerReset = producerReset;
     }
 
     public void setSchemaRegistry(String schemaRegistry) {
@@ -69,7 +69,7 @@ public class KafkaService implements InitializingBean {
         props.put("zookeeper.connect", zookeeper);
         props.put("group.id", groupId);
         props.put("auto.commit.enable", autoCommit);
-        props.put("auto.offset.reset", reset);
+        props.put("auto.offset.reset", producerReset);
         props.put("schema.registry.url", schemaRegistry);
         props.put("bootstrap.servers", brokerList);
 

@@ -12,16 +12,16 @@ import javax.validation.constraints.NotNull;
 import java.util.concurrent.Future;
 
 @Component
-@ConfigurationProperties(prefix="kafka.topics")
+@ConfigurationProperties(prefix="kafka")
 public class PostCreationService {
     @NotNull
     private String postsTopic;
-    private final KafkaService kafkaService;
+    private final KafkaProducerService kafkaProducerService;
     private final PostSchemaService postSchemaService;
 
     @Autowired
-    public PostCreationService(KafkaService kafkaService, PostSchemaService postSchemaService) throws Exception {
-        this.kafkaService = kafkaService;
+    public PostCreationService(KafkaProducerService kafkaProducerService, PostSchemaService postSchemaService) throws Exception {
+        this.kafkaProducerService = kafkaProducerService;
         this.postSchemaService = postSchemaService;
     }
 
@@ -38,6 +38,6 @@ public class PostCreationService {
                 postRecord
         );
 
-        return kafkaService.sendRecord(kafkaRecord);
+        return kafkaProducerService.sendRecord(kafkaRecord);
     }
 }
