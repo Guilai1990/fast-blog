@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wkh.fastblog.domain.Post;
 import org.wkh.fastblog.services.PostCreationService;
+import org.wkh.fastblog.services.RedisService;
 
+import java.util.List;
 import java.util.concurrent.Future;
 
 @Controller
@@ -25,10 +27,12 @@ public class PostsController implements ApplicationContextAware {
     private String adminUsername;
 
     private final PostCreationService postCreationService;
+    private final RedisService redisService;
 
     @Autowired
-    public PostsController(PostCreationService postCreationService) {
+    public PostsController(PostCreationService postCreationService, RedisService redisService) {
         this.postCreationService = postCreationService;
+        this.redisService = redisService;
     }
 
     @Override
@@ -63,6 +67,14 @@ public class PostsController implements ApplicationContextAware {
         return username.equals(adminUsername);
     }
 
+    @RequestMapping(value = "/posts", method = RequestMethod.GET)
+    public String listPosts(Model model) throws Exception {
+        List<Post> posts = redisService.getPosts();
+
+        model.addAttribute("posts", posts);
+
+        return "post_list";
+    }
     @RequestMapping(value = "/posts/new", method = RequestMethod.GET)
     public String createPostView() {
         return "edit_new_post";

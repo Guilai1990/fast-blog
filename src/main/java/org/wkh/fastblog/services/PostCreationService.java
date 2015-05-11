@@ -14,15 +14,19 @@ import java.util.concurrent.Future;
 @Component
 @ConfigurationProperties(prefix="kafka")
 public class PostCreationService {
+    public static String postListKey = "posts";
+
     @NotNull
     private String postsTopic;
     private final KafkaProducerService kafkaProducerService;
     private final PostSchemaService postSchemaService;
+    private final SerializationService serializationService;
 
     @Autowired
-    public PostCreationService(KafkaProducerService kafkaProducerService, PostSchemaService postSchemaService) throws Exception {
+    public PostCreationService(KafkaProducerService kafkaProducerService, PostSchemaService postSchemaService, SerializationService serializationService) throws Exception {
         this.kafkaProducerService = kafkaProducerService;
         this.postSchemaService = postSchemaService;
+        this.serializationService = serializationService;
     }
 
     public void setPostsTopic(String postsTopic) {
@@ -30,7 +34,7 @@ public class PostCreationService {
     }
 
     public Future<RecordMetadata> create(Post post) {
-        GenericRecord postRecord = post.toRecord(postSchemaService.getSchema());
+        GenericRecord postRecord = serializationService.toRecord(post);
 
         ProducerRecord<String, GenericRecord> kafkaRecord = new ProducerRecord<String, GenericRecord>(
                 postsTopic,

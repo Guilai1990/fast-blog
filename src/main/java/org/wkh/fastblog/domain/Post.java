@@ -109,64 +109,6 @@ public class Post implements Serializable {
         return summary;
     }
 
-    /**
-     * Serialize this post to an Avro record.
-     *
-     * @return GenericRecord
-     */
-    public GenericRecord toRecord(Schema schema) {
-        GenericRecord record = new GenericData.Record(schema);
-
-        record.put("id", id);
-        record.put("created_at", createdAt.getTime());
-        record.put("published", published);
-
-        if (publishedAt != null) {
-            record.put("published_at", publishedAt.getTime());
-        } else {
-            record.put("published_at", null);
-        }
-
-        record.put("title", title);
-        record.put("body", body);
-        record.put("summary", summary);
-        record.put("slug", slug);
-
-        return record;
-    }
-
-    public static String getStringFromAvroObject(GenericRecord record, String field) {
-        Utf8 id = (Utf8)record.get(field);
-        return id.toString();
-    }
-
-    public static Post fromRecord(GenericRecord record) {
-        log.info("Trying to serialize from record with ID: " + record.get("id"));
-
-        Date createdAt = new Date((Long)record.get("created_at"));
-
-        Date publishedAt = null;
-
-        if (record.get("published_at") != null) {
-            publishedAt = new Date((Long)record.get("published_at"));
-        }
-
-        Post post = new Post(
-                getStringFromAvroObject(record, "id"),
-                createdAt,
-                (Boolean) record.get("published"),
-                publishedAt,
-                getStringFromAvroObject(record, "title"),
-                getStringFromAvroObject(record, "body"),
-                getStringFromAvroObject(record, "summary"),
-                getStringFromAvroObject(record, "slug")
-        );
-
-        log.info("Got to the end");
-
-        return post;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

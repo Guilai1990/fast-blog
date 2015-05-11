@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
@@ -66,6 +67,12 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
 
     @NotNull
     private String postsTopic;
+
+    @Autowired
+    private SerializationService serializationService;
+
+    @Autowired
+    private RedisService redisService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -110,7 +117,7 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
 
         // Create PostConsumerThread objects and bind them to threads
         for (final KafkaStream stream : streams) {
-            executor.submit(new PostConsumerThread(stream));
+            executor.submit(new PostConsumerThread(stream, serializationService, redisService));
         }
     }
 

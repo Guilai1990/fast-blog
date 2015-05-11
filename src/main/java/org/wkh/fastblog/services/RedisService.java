@@ -1,27 +1,61 @@
 package org.wkh.fastblog.services;
 
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.ListOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.wkh.fastblog.domain.Post;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
-import javax.annotation.Resource;
+import java.util.*;
+
 
 @Service
-public class RedisService {
-    @Bean
-    StringRedisTemplate redisTemplate(RedisConnectionFactory connectionFactory) {
-        return new StringRedisTemplate(connectionFactory);
+public class RedisService implements InitializingBean, DisposableBean {
+    private JedisPool pool;
+    private Jedis jedis;
+
+    @Autowired
+    private SerializationService serializationService;
+
+    public void addPostToList(Post post) throws Exception {
+        String key = PostCreationService.postListKey;
+
+        byte[] bytes = serializationService.serializePost(post);
+
+        double score = (double) post.getCreatedAt().getTime();
+
+        Map<byte[], Double> scoreMembers = new HashMap<byte[], Double>(1);
+        scoreMembers.put(bytes, score);
+
+        jedis.zadd(key.getBytes(), scoreMembers);
     }
 
-    @Resource(name="redisTemplate")
-    private ListOperations<String, Post> listOps;
+    public List<Post> getPosts() throws Exception {
+        String key = PostCreationService.postListKey;
+        Set<byte[]> postBytesSet = jedis.zrange(key.getBytes(), 0, -1);
 
-    public void addPostToList(Post post) {
-        listOps.leftPush("posts", post);
+        List<Post> posts = new ArrayList<Post>();
+
+        for(byte[] postBytes : postBytesSet) {
+            Post post = serializationService.deserializePost(postBytes);
+
+            posts.add(post);
+        }
+
+        return posts;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        JedisPool pool = new JedisPool(new JedisPoolConfig(), "localhost");
+        jedis = pool.getResource();
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        pool.close();
     }
 }

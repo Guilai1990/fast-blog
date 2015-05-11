@@ -20,46 +20,66 @@ Original license follows
 package org.wkh.fastblog.services;
 
 import kafka.consumer.ConsumerIterator;
-import kafka.serializer.Decoder;
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 
 import kafka.consumer.KafkaStream;
 import kafka.message.MessageAndMetadata;
-import org.apache.avro.io.DatumReader;
-import org.apache.avro.util.Utf8;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.wkh.fastblog.domain.Post;
 
+@Component
 public class PostConsumerThread implements Runnable {
     private Logger log = LoggerFactory.getLogger(PostConsumerThread.class);
     private KafkaStream stream;
 
-    @Autowired
+    public PostConsumerThread() {
+
+    }
+
     private RedisService redisService;
 
-    public PostConsumerThread(KafkaStream stream) {
+    private SerializationService serializationService;
+
+    public PostConsumerThread(KafkaStream stream, SerializationService serializationService, RedisService redisService) {
         this.stream = stream;
+        this.serializationService = serializationService;
+        this.redisService = redisService;
     }
 
     public void run() {
         log.info("Consumer thread started");
+
         ConsumerIterator<Object, Object> it = stream.iterator();
 
         while (it.hasNext()) {
             MessageAndMetadata<Object, Object> record = it.next();
             GenericRecord message = (GenericRecord) record.message();
 
-            log.info("Going to try to reconstruct...");
+            if (serializationService == null) {
+                log.error("Serialization service is null!");
+                continue;
+            }
 
-            Post post = Post.fromRecord(message);
+            log.info("Going to deserialize post");
 
-            log.info("Reconstruction worked! ID is: " + post.getId());
+            Post post = serializationService.fromRecord(message);
 
-            redisService.addPostToList(post);
+            log.info("Going to send post " + post.getId() + " to redis");
+
+            if (redisService == null) {
+                log.error("The Redis service is null!");
+                continue;
+            }
+
+            try {
+                redisService.addPostToList(post);
+            } catch (Exception e) {
+                log.error("Unable to add post " + post.getId() + " to Redis!");
+                e.printStackTrace();
+            }
         }
 
         log.info("Shutting down thread");
