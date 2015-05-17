@@ -15,8 +15,6 @@ import java.util.concurrent.Future;
 @Component
 @ConfigurationProperties(prefix="kafka")
 public class PostCreationService {
-    public static String postListKey = "posts";
-
     @NotNull
     private String postsTopic;
     private final KafkaProducerService kafkaProducerService;
