@@ -35,9 +35,9 @@ public class PostCreationService {
     public Future<RecordMetadata> create(Post post) throws Exception {
         byte[] serialized = serializationService.serializePost(post);
 
-        ProducerRecord<CharSequence, byte[]> kafkaRecord = new ProducerRecord<CharSequence, byte[]>(
+        ProducerRecord<byte[], byte[]> kafkaRecord = new ProducerRecord<byte[], byte[]>(
                 postsTopic,
-                post.getId(),
+                post.getId().toString().getBytes(),
                 serialized
         );
 

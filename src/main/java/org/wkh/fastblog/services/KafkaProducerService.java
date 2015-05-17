@@ -24,7 +24,7 @@ public class KafkaProducerService implements InitializingBean {
     @NotNull
     private String brokerList;
 
-    private Producer<CharSequence, byte[]> producer;
+    private Producer<byte[], byte[]> producer;
 
     public void setZookeeper(String zookeeper) {
         this.zookeeper = zookeeper;
@@ -50,13 +50,15 @@ public class KafkaProducerService implements InitializingBean {
         props.put("group.id", groupId);
         props.put("auto.offset.reset", producerReset);
         props.put("bootstrap.servers", brokerList);
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "kafka.serializer.StringEncoder");
+        props.put("serializer.class", "org.apache.kafka.common.serialization.ByteArraySerializer");
+        props.put("key.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer");
+        props.put("value.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer");
         props.put("request.required.acks", "1");
 
-        producer = new KafkaProducer<CharSequence, byte[]>(props);
+        producer = new KafkaProducer<byte[], byte[]>(props);
     }
 
-    public Future<RecordMetadata> sendRecord(ProducerRecord<CharSequence, byte[]> record) {
+    public Future<RecordMetadata> sendRecord(ProducerRecord<byte[], byte[]> record) {
         return producer.send(record);
     }
 }

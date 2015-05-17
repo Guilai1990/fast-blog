@@ -56,9 +56,6 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
     private String consumerReset;
 
     @NotNull
-    private String schemaRegistry;
-
-    @NotNull
     private Integer threadCount;
 
     private ConsumerConnector consumer;
@@ -91,7 +88,6 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
         props.put("zookeeper.connect", zookeeper);
         props.put("group.id", groupId);
         props.put("auto.offset.reset", consumerReset);
-        props.put("schema.registry.url", schemaRegistry);
 
         return props;
     }
@@ -141,10 +137,6 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
 
     public void setConsumerReset(String consumerReset) {
         this.consumerReset = consumerReset;
-    }
-
-    public void setSchemaRegistry(String schemaRegistry) {
-        this.schemaRegistry = schemaRegistry;
     }
 
     public void setPostsTopic(String postsTopic) {
