@@ -1,4 +1,4 @@
-package org.wkh.fastblog.services;
+package org.wkh.fastblog.serialization;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
@@ -9,36 +9,32 @@ import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.avro.util.Utf8;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.wkh.fastblog.domain.Post;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Date;
 
 @Service
 public class SerializationService {
+    public static final Schema POST_SCHEMA = Post.getClassSchema();
     private Logger log = LoggerFactory.getLogger(SerializationService.class);
 
-    @Autowired
-    private PostSchemaService postSchemaService;
-
     public byte[] serializePost(Post post) throws Exception {
-        Schema postSchema = postSchemaService.getSchema();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(out, null);
-        DatumWriter<GenericRecord> writer = new SpecificDatumWriter<GenericRecord>(postSchema);
+        DatumWriter<GenericRecord> writer = new SpecificDatumWriter<GenericRecord>(POST_SCHEMA);
 
         GenericRecord postRecord = toRecord(post);
 
         writer.write(postRecord, encoder);
         encoder.flush();
         out.close();
+
         return out.toByteArray();
     }
 
     public Post deserializePost(byte[] bytes) throws Exception {
-        SpecificDatumReader<GenericRecord> reader = new SpecificDatumReader<GenericRecord>(postSchemaService.getSchema());
+        SpecificDatumReader<GenericRecord> reader = new SpecificDatumReader<GenericRecord>(POST_SCHEMA);
 
         Decoder decoder = DecoderFactory.get().binaryDecoder(bytes, null);
         GenericRecord record = reader.read(null, decoder);
@@ -52,14 +48,14 @@ public class SerializationService {
      * @return GenericRecord
      */
     public GenericRecord toRecord(Post post) {
-        GenericRecord record = new GenericData.Record(postSchemaService.getSchema());
+        GenericRecord record = new GenericData.Record(POST_SCHEMA);
 
         record.put("id", post.getId());
-        record.put("created_at", post.getCreatedAt().getTime());
-        record.put("published", post.isPublished());
+        record.put("created_at", post.getCreatedAt());
+        record.put("published", post.getPublished());
 
         if (post.getPublishedAt() != null) {
-            record.put("published_at", post.getPublishedAt().getTime());
+            record.put("published_at", post.getPublishedAt());
         } else {
             record.put("published_at", null);
         }
@@ -80,12 +76,12 @@ public class SerializationService {
     public Post fromRecord(GenericRecord record) {
         log.info("Trying to serialize from record with ID: " + record.get("id"));
 
-        Date createdAt = new Date((Long)record.get("created_at"));
+        Long createdAt = (Long)record.get("created_at");
 
-        Date publishedAt = null;
+        Long publishedAt = null;
 
         if (record.get("published_at") != null) {
-            publishedAt = new Date((Long)record.get("published_at"));
+            publishedAt = (Long)record.get("published_at");
         }
 
         Post post = new Post(

@@ -15,9 +15,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wkh.fastblog.domain.Post;
+import org.wkh.fastblog.domain.PostForm;
 import org.wkh.fastblog.services.PostCreationService;
-import org.wkh.fastblog.services.RedisService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -27,12 +28,10 @@ public class PostsController implements ApplicationContextAware {
     private String adminUsername;
 
     private final PostCreationService postCreationService;
-    private final RedisService redisService;
 
     @Autowired
-    public PostsController(PostCreationService postCreationService, RedisService redisService) {
+    public PostsController(PostCreationService postCreationService) {
         this.postCreationService = postCreationService;
-        this.redisService = redisService;
     }
 
     @Override
@@ -69,7 +68,7 @@ public class PostsController implements ApplicationContextAware {
 
     @RequestMapping(value = "/posts", method = RequestMethod.GET)
     public String listPosts(Model model) throws Exception {
-        List<Post> posts = redisService.getPosts();
+        List<Post> posts = new ArrayList<Post>();
 
         model.addAttribute("posts", posts);
 
@@ -84,8 +83,8 @@ public class PostsController implements ApplicationContextAware {
     public String createPost(@RequestParam(value = "body", required = true) String body,
                              @RequestParam(value = "title", required = true) String title,
                              @RequestParam(value = "summary") String summary,
-                             final RedirectAttributes redirectAttributes) {
-        Post post = new Post(title, body, summary);
+                             final RedirectAttributes redirectAttributes) throws Exception {
+        Post post = PostForm.fromForm(title, body, summary);
 
         Future<RecordMetadata> result = postCreationService.create(post);
 

@@ -1,7 +1,7 @@
 {
-  "namespace": "org.wkh.fastblog",
+  "namespace": "org.wkh.fastblog.domain",
   "type": "record",
-  "name": "post",
+  "name": "Post",
   "fields": [
     {"name": "id", "type": "string"},
     {"name": "created_at", "type": "long"},

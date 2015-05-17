@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.wkh.fastblog.domain.Post;
+import org.wkh.fastblog.serialization.SerializationService;
 
 import javax.validation.constraints.NotNull;
 import java.util.concurrent.Future;
@@ -19,13 +20,11 @@ public class PostCreationService {
     @NotNull
     private String postsTopic;
     private final KafkaProducerService kafkaProducerService;
-    private final PostSchemaService postSchemaService;
     private final SerializationService serializationService;
 
     @Autowired
-    public PostCreationService(KafkaProducerService kafkaProducerService, PostSchemaService postSchemaService, SerializationService serializationService) throws Exception {
+    public PostCreationService(KafkaProducerService kafkaProducerService, SerializationService serializationService) throws Exception {
         this.kafkaProducerService = kafkaProducerService;
-        this.postSchemaService = postSchemaService;
         this.serializationService = serializationService;
     }
 
@@ -33,13 +32,13 @@ public class PostCreationService {
         this.postsTopic = postsTopic;
     }
 
-    public Future<RecordMetadata> create(Post post) {
-        GenericRecord postRecord = serializationService.toRecord(post);
+    public Future<RecordMetadata> create(Post post) throws Exception {
+        byte[] serialized = serializationService.serializePost(post);
 
-        ProducerRecord<String, GenericRecord> kafkaRecord = new ProducerRecord<String, GenericRecord>(
+        ProducerRecord<CharSequence, byte[]> kafkaRecord = new ProducerRecord<CharSequence, byte[]>(
                 postsTopic,
                 post.getId(),
-                postRecord
+                serialized
         );
 
         return kafkaProducerService.sendRecord(kafkaRecord);

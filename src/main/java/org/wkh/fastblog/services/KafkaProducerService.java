@@ -1,6 +1,5 @@
 package org.wkh.fastblog.services;
 
-import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -23,12 +22,9 @@ public class KafkaProducerService implements InitializingBean {
     private String producerReset;
 
     @NotNull
-    private String schemaRegistry;
-
-    @NotNull
     private String brokerList;
 
-    private Producer<String, GenericRecord> producer;
+    private Producer<CharSequence, byte[]> producer;
 
     public void setZookeeper(String zookeeper) {
         this.zookeeper = zookeeper;
@@ -42,10 +38,6 @@ public class KafkaProducerService implements InitializingBean {
         this.producerReset = producerReset;
     }
 
-    public void setSchemaRegistry(String schemaRegistry) {
-        this.schemaRegistry = schemaRegistry;
-    }
-
     public void setBrokerList(String brokerList) {
         this.brokerList = brokerList;
     }
@@ -54,21 +46,17 @@ public class KafkaProducerService implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         Properties props = new Properties();
 
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-                io.confluent.kafka.serializers.KafkaAvroSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-                io.confluent.kafka.serializers.KafkaAvroSerializer.class);
-
         props.put("zookeeper.connect", zookeeper);
         props.put("group.id", groupId);
         props.put("auto.offset.reset", producerReset);
-        props.put("schema.registry.url", schemaRegistry);
         props.put("bootstrap.servers", brokerList);
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "kafka.serializer.StringEncoder");
+        props.put("request.required.acks", "1");
 
-        producer = new KafkaProducer<String, GenericRecord>(props);
+        producer = new KafkaProducer<CharSequence, byte[]>(props);
     }
 
-    public Future<RecordMetadata> sendRecord(ProducerRecord<String, GenericRecord> record) {
+    public Future<RecordMetadata> sendRecord(ProducerRecord<CharSequence, byte[]> record) {
         return producer.send(record);
     }
 }

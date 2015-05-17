@@ -20,7 +20,6 @@ Original license follows
 
 package org.wkh.fastblog.services;
 
-import io.confluent.kafka.serializers.KafkaAvroDecoder;
 import kafka.consumer.ConsumerConfig;import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 import java.util.HashMap;import java.util.List;
@@ -38,6 +37,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
+import org.wkh.fastblog.serialization.SerializationService;
 
 import javax.validation.constraints.NotNull;
 
@@ -71,8 +71,6 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
     @Autowired
     private SerializationService serializationService;
 
-    @Autowired
-    private RedisService redisService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -105,19 +103,16 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
         Properties props = createConsumerConfig();
         VerifiableProperties vProps = new VerifiableProperties(props);
 
-        // Create decoders for key and value
-        KafkaAvroDecoder avroDecoder = new KafkaAvroDecoder(vProps);
-
-        Map<String, List<KafkaStream<Object, Object>>> consumerMap =
-                consumer.createMessageStreams(topicCountMap, avroDecoder, avroDecoder);
-        List<KafkaStream<Object, Object>> streams = consumerMap.get(postsTopic);
+        Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap =
+                consumer.createMessageStreams(topicCountMap);
+        List<KafkaStream<byte[], byte[]>> streams = consumerMap.get(postsTopic);
 
         // Launch all the threads
         executor = Executors.newFixedThreadPool(threadCount);
 
         // Create PostConsumerThread objects and bind them to threads
         for (final KafkaStream stream : streams) {
-            executor.submit(new PostConsumerThread(stream, serializationService, redisService));
+            executor.submit(new PostConsumerThread(stream, serializationService));
         }
     }
 

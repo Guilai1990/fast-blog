@@ -26,9 +26,9 @@ import kafka.consumer.KafkaStream;
 import kafka.message.MessageAndMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.wkh.fastblog.domain.Post;
+import org.wkh.fastblog.serialization.SerializationService;
 
 @Component
 public class PostConsumerThread implements Runnable {
@@ -39,24 +39,21 @@ public class PostConsumerThread implements Runnable {
 
     }
 
-    private RedisService redisService;
-
     private SerializationService serializationService;
 
-    public PostConsumerThread(KafkaStream stream, SerializationService serializationService, RedisService redisService) {
+    public PostConsumerThread(KafkaStream stream, SerializationService serializationService) {
         this.stream = stream;
         this.serializationService = serializationService;
-        this.redisService = redisService;
     }
 
     public void run() {
         log.info("Consumer thread started");
 
-        ConsumerIterator<Object, Object> it = stream.iterator();
+        ConsumerIterator<byte[], byte[]> it = stream.iterator();
 
         while (it.hasNext()) {
-            MessageAndMetadata<Object, Object> record = it.next();
-            GenericRecord message = (GenericRecord) record.message();
+            MessageAndMetadata<byte[], byte[]> record = it.next();
+            byte[] message = record.message();
 
             if (serializationService == null) {
                 log.error("Serialization service is null!");
@@ -65,20 +62,10 @@ public class PostConsumerThread implements Runnable {
 
             log.info("Going to deserialize post");
 
-            Post post = serializationService.fromRecord(message);
-
-            log.info("Going to send post " + post.getId() + " to redis");
-
-            if (redisService == null) {
-                log.error("The Redis service is null!");
-                continue;
-            }
-
             try {
-                redisService.addPostToList(post);
-            } catch (Exception e) {
-                log.error("Unable to add post " + post.getId() + " to Redis!");
-                e.printStackTrace();
+                Post post = serializationService.deserializePost(message);
+            } catch(Exception e) {
+                log.error("Error trying to deserialize post!");
             }
         }
 

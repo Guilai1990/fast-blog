@@ -1,6 +1,5 @@
 package org.wkh.fastblog.domain;
 
-import org.apache.avro.generic.GenericRecord;
 import org.joda.time.DateTimeUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,8 +8,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.wkh.fastblog.WebApplication;
-import org.wkh.fastblog.services.PostSchemaService;
-import org.wkh.fastblog.services.SerializationService;
+import org.wkh.fastblog.serialization.SerializationService;
 
 import java.util.Date;
 
@@ -19,7 +17,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = WebApplication.class)
 @WebIntegrationTest
-public class PostTest {
+public class PostFormTest {
     @Autowired
     private SerializationService serializationService;
 
@@ -28,14 +26,14 @@ public class PostTest {
         Long now = new Date().getTime();
         DateTimeUtils.setCurrentMillisFixed(now);
 
-        Post post = new Post("   Post Title! #1   Part      2 ", "Body", "Summary");
+        String title = "   Post Title! #1   Part      2 ";
 
-        assertEquals(now + "-post-title-1-part-2", post.getSlug());
+        assertEquals(now + "-post-title-1-part-2", PostForm.generateSlug(title));
     }
 
     @Test
     public void testSerialization() throws Exception {
-        Post post = new Post("title", "body", "summary");
+        Post post = PostForm.fromForm("title", "body", "summary");
 
         byte[] bytes = serializationService.serializePost(post);
 
