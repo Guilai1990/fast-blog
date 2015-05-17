@@ -13,14 +13,6 @@
                 <div class="col-xs-12">
                     <h1>New Post</h1>
 
-                    <#if post_creation_succeeded??>
-                        <#if post_creation_succeeded>
-                            <p class="bg-success">Post created!</p>
-                        <#else>
-                            <p class="bg-danger">Error creating post! Please check server/console logs for more information.</p>
-                        </#if>
-                    </#if>
-
                     <form action="/posts/create" method="post">
                         <input type="hidden"
                                name="${_csrf.parameterName}"

@@ -7,8 +7,6 @@ import org.apache.avro.io.*;
 import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.avro.util.Utf8;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.wkh.fastblog.domain.Post;
 
@@ -17,7 +15,6 @@ import java.io.ByteArrayOutputStream;
 @Service
 public class SerializationService {
     public static final Schema POST_SCHEMA = Post.getClassSchema();
-    private Logger log = LoggerFactory.getLogger(SerializationService.class);
 
     public byte[] serializePost(Post post) throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -74,8 +71,6 @@ public class SerializationService {
     }
 
     public Post fromRecord(GenericRecord record) {
-        log.info("Trying to serialize from record with ID: " + record.get("id"));
-
         Long createdAt = (Long)record.get("created_at");
 
         Long publishedAt = null;
@@ -94,8 +89,6 @@ public class SerializationService {
                 getStringFromAvroObject(record, "summary"),
                 getStringFromAvroObject(record, "slug")
         );
-
-        log.info("Got to the end");
 
         return post;
     }

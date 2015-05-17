@@ -90,7 +90,7 @@ public class PostsController implements ApplicationContextAware {
 
         redirectAttributes.addFlashAttribute("post_creation_succeeded", result != null);
 
-        return "redirect:/posts/new";
+        return "redirect:/posts";
     }
 
 }

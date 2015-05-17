@@ -108,7 +108,7 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
 
         // Create PostConsumerThread objects and bind them to threads
         for (final KafkaStream stream : streams) {
-            executor.submit(new PostConsumerThread(stream, serializationService));
+            executor.submit(new PostConsumerThread(stream, serializationService, consumer));
         }
     }
 

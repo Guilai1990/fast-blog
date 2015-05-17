@@ -20,6 +20,7 @@ Original license follows
 package org.wkh.fastblog.services;
 
 import kafka.consumer.ConsumerIterator;
+import kafka.javaapi.consumer.ConsumerConnector;
 import org.apache.avro.generic.GenericRecord;
 
 import kafka.consumer.KafkaStream;
@@ -34,6 +35,7 @@ import org.wkh.fastblog.serialization.SerializationService;
 public class PostConsumerThread implements Runnable {
     private Logger log = LoggerFactory.getLogger(PostConsumerThread.class);
     private KafkaStream stream;
+    private ConsumerConnector consumerConnector;
 
     public PostConsumerThread() {
 
@@ -41,9 +43,10 @@ public class PostConsumerThread implements Runnable {
 
     private SerializationService serializationService;
 
-    public PostConsumerThread(KafkaStream stream, SerializationService serializationService) {
+    public PostConsumerThread(KafkaStream stream, SerializationService serializationService, ConsumerConnector consumerConnector) {
         this.stream = stream;
         this.serializationService = serializationService;
+        this.consumerConnector = consumerConnector;
     }
 
     public void run() {
@@ -67,6 +70,8 @@ public class PostConsumerThread implements Runnable {
             } catch(Exception e) {
                 log.error("Error trying to deserialize post!");
             }
+
+            consumerConnector.commitOffsets();
         }
 
         log.info("Shutting down thread");
