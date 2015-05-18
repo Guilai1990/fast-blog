@@ -11,6 +11,7 @@
     {"name": "body", "type": "string"},
     {"name": "summary", "type": "string"},
     {"name": "slug", "type": "string"},
-    {"name": "stored_in_rdbms", "type": "boolean"}
+    {"name": "stored_in_rdbms", "type": "boolean"},
+    {"name": "soft_deleted", "type": "boolean"}
   ]
 }

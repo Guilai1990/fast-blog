@@ -62,6 +62,7 @@ public class SerializationService {
         record.put("summary", postRecord.getSummary());
         record.put("slug", postRecord.getSlug());
         record.put("stored_in_rdbms", postRecord.getStoredInRdbms());
+        record.put("soft_deleted", postRecord.getSoftDeleted());
 
         return record;
     }
@@ -89,7 +90,8 @@ public class SerializationService {
                 getStringFromAvroObject(record, "body"),
                 getStringFromAvroObject(record, "summary"),
                 getStringFromAvroObject(record, "slug"),
-                (Boolean) record.get("stored_in_rdbms")
+                (Boolean) record.get("stored_in_rdbms"),
+                (Boolean) record.get("soft_deleted")
         );
 
         return postRecord;

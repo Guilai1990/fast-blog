@@ -66,6 +66,7 @@ public class Post {
                 .setId(id)
                 .setSlug(slug)
                 .setStoredInRdbms(false)
+                .setSoftDeleted(false)
                 .build();
 
         return postRecord;

@@ -7,7 +7,7 @@ package org.wkh.fastblog.domain;
 @SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class PostRecord extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"PostRecord\",\"namespace\":\"org.wkh.fastblog.domain\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"created_at\",\"type\":\"long\"},{\"name\":\"published\",\"type\":\"boolean\"},{\"name\":\"published_at\",\"type\":[\"null\",\"long\"]},{\"name\":\"title\",\"type\":\"string\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"summary\",\"type\":\"string\"},{\"name\":\"slug\",\"type\":\"string\"},{\"name\":\"stored_in_rdbms\",\"type\":\"boolean\"}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"PostRecord\",\"namespace\":\"org.wkh.fastblog.domain\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"created_at\",\"type\":\"long\"},{\"name\":\"published\",\"type\":\"boolean\"},{\"name\":\"published_at\",\"type\":[\"null\",\"long\"]},{\"name\":\"title\",\"type\":\"string\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"summary\",\"type\":\"string\"},{\"name\":\"slug\",\"type\":\"string\"},{\"name\":\"stored_in_rdbms\",\"type\":\"boolean\"},{\"name\":\"soft_deleted\",\"type\":\"boolean\"}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
   @Deprecated public java.lang.CharSequence id;
   @Deprecated public long created_at;
@@ -18,6 +18,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
   @Deprecated public java.lang.CharSequence summary;
   @Deprecated public java.lang.CharSequence slug;
   @Deprecated public boolean stored_in_rdbms;
+  @Deprecated public boolean soft_deleted;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -29,7 +30,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
   /**
    * All-args constructor.
    */
-  public PostRecord(java.lang.CharSequence id, java.lang.Long created_at, java.lang.Boolean published, java.lang.Long published_at, java.lang.CharSequence title, java.lang.CharSequence body, java.lang.CharSequence summary, java.lang.CharSequence slug, java.lang.Boolean stored_in_rdbms) {
+  public PostRecord(java.lang.CharSequence id, java.lang.Long created_at, java.lang.Boolean published, java.lang.Long published_at, java.lang.CharSequence title, java.lang.CharSequence body, java.lang.CharSequence summary, java.lang.CharSequence slug, java.lang.Boolean stored_in_rdbms, java.lang.Boolean soft_deleted) {
     this.id = id;
     this.created_at = created_at;
     this.published = published;
@@ -39,6 +40,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     this.summary = summary;
     this.slug = slug;
     this.stored_in_rdbms = stored_in_rdbms;
+    this.soft_deleted = soft_deleted;
   }
 
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
@@ -54,6 +56,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     case 6: return summary;
     case 7: return slug;
     case 8: return stored_in_rdbms;
+    case 9: return soft_deleted;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -70,6 +73,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     case 6: summary = (java.lang.CharSequence)value$; break;
     case 7: slug = (java.lang.CharSequence)value$; break;
     case 8: stored_in_rdbms = (java.lang.Boolean)value$; break;
+    case 9: soft_deleted = (java.lang.Boolean)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -209,6 +213,21 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     this.stored_in_rdbms = value;
   }
 
+  /**
+   * Gets the value of the 'soft_deleted' field.
+   */
+  public java.lang.Boolean getSoftDeleted() {
+    return soft_deleted;
+  }
+
+  /**
+   * Sets the value of the 'soft_deleted' field.
+   * @param value the value to set.
+   */
+  public void setSoftDeleted(java.lang.Boolean value) {
+    this.soft_deleted = value;
+  }
+
   /** Creates a new PostRecord RecordBuilder */
   public static org.wkh.fastblog.domain.PostRecord.Builder newBuilder() {
     return new org.wkh.fastblog.domain.PostRecord.Builder();
@@ -239,6 +258,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     private java.lang.CharSequence summary;
     private java.lang.CharSequence slug;
     private boolean stored_in_rdbms;
+    private boolean soft_deleted;
 
     /** Creates a new Builder */
     private Builder() {
@@ -284,6 +304,10 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
         this.stored_in_rdbms = data().deepCopy(fields()[8].schema(), other.stored_in_rdbms);
         fieldSetFlags()[8] = true;
       }
+      if (isValidValue(fields()[9], other.soft_deleted)) {
+        this.soft_deleted = data().deepCopy(fields()[9].schema(), other.soft_deleted);
+        fieldSetFlags()[9] = true;
+      }
     }
     
     /** Creates a Builder by copying an existing PostRecord instance */
@@ -324,6 +348,10 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
       if (isValidValue(fields()[8], other.stored_in_rdbms)) {
         this.stored_in_rdbms = data().deepCopy(fields()[8].schema(), other.stored_in_rdbms);
         fieldSetFlags()[8] = true;
+      }
+      if (isValidValue(fields()[9], other.soft_deleted)) {
+        this.soft_deleted = data().deepCopy(fields()[9].schema(), other.soft_deleted);
+        fieldSetFlags()[9] = true;
       }
     }
 
@@ -549,6 +577,30 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
       return this;
     }
 
+    /** Gets the value of the 'soft_deleted' field */
+    public java.lang.Boolean getSoftDeleted() {
+      return soft_deleted;
+    }
+    
+    /** Sets the value of the 'soft_deleted' field */
+    public org.wkh.fastblog.domain.PostRecord.Builder setSoftDeleted(boolean value) {
+      validate(fields()[9], value);
+      this.soft_deleted = value;
+      fieldSetFlags()[9] = true;
+      return this; 
+    }
+    
+    /** Checks whether the 'soft_deleted' field has been set */
+    public boolean hasSoftDeleted() {
+      return fieldSetFlags()[9];
+    }
+    
+    /** Clears the value of the 'soft_deleted' field */
+    public org.wkh.fastblog.domain.PostRecord.Builder clearSoftDeleted() {
+      fieldSetFlags()[9] = false;
+      return this;
+    }
+
     @Override
     public PostRecord build() {
       try {
@@ -562,6 +614,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
         record.summary = fieldSetFlags()[6] ? this.summary : (java.lang.CharSequence) defaultValue(fields()[6]);
         record.slug = fieldSetFlags()[7] ? this.slug : (java.lang.CharSequence) defaultValue(fields()[7]);
         record.stored_in_rdbms = fieldSetFlags()[8] ? this.stored_in_rdbms : (java.lang.Boolean) defaultValue(fields()[8]);
+        record.soft_deleted = fieldSetFlags()[9] ? this.soft_deleted : (java.lang.Boolean) defaultValue(fields()[9]);
         return record;
       } catch (Exception e) {
         throw new org.apache.avro.AvroRuntimeException(e);
