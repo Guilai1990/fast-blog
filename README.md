@@ -10,6 +10,7 @@ Currently this is extremely early in its development and basically useless. Chec
 
 This project is some extent merely a testbed for playing with new and old techologies, eventually likely including:
 
+* [Spring Boot](http://projects.spring.io/spring-boot/)
 * [Apache Kafka](http://kafka.apache.org/)
 * [PostgreSQL](http://www.postgresql.org/)
 * [Apache Solr](http://lucene.apache.org/solr/)
