@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = WebApplication.class)
 @WebIntegrationTest
-public class PostFormTest {
+public class PostTest {
     @Autowired
     private SerializationService serializationService;
 
@@ -28,17 +28,17 @@ public class PostFormTest {
 
         String title = "   Post Title! #1   Part      2 ";
 
-        assertEquals(now + "-post-title-1-part-2", PostForm.generateSlug(title));
+        assertEquals(now + "-post-title-1-part-2", Post.generateSlug(title));
     }
 
     @Test
     public void testSerialization() throws Exception {
-        Post post = PostForm.fromForm("title", "body", "summary");
+        PostRecord postRecord = Post.fromForm("title", "body", "summary");
 
-        byte[] bytes = serializationService.serializePost(post);
+        byte[] bytes = serializationService.serializePost(postRecord);
 
-        Post newPost = serializationService.deserializePost(bytes);
+        PostRecord newPostRecord = serializationService.deserializePost(bytes);
 
-        assertEquals(newPost, post);
+        assertEquals(newPostRecord, postRecord);
     }
 }

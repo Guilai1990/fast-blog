@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.wkh.fastblog.cassandra.CassandraPostDAO;
-import org.wkh.fastblog.domain.Post;
+import org.wkh.fastblog.domain.PostRecord;
 import org.wkh.fastblog.serialization.SerializationService;
 
 @Component
@@ -70,18 +70,19 @@ public class CassandraPostConsumerThread implements Runnable  {
 
             log.info("Going to deserialize post");
 
-            Post post;
+            PostRecord postRecord;
 
             try {
-                post = serializationService.deserializePost(message);
+                postRecord = serializationService.deserializePost(message);
             } catch(Exception e) {
                 log.error("Error trying to deserialize post!");
+                log.error(e.toString());
                 continue;
             }
 
             log.info("Going to try to send the post to Cassandra");
 
-            dao.insert(post);
+            dao.insert(postRecord);
 
             log.info("We got to after the insert call");
 

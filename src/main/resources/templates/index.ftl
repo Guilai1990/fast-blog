@@ -24,5 +24,13 @@
     <#else>
         <p>You're a normal user! Thanks for visiting!</p>
     </#if>
+
+    <#list posts as post>
+        <h1>${post.title}</h1>
+        <p><em>${post.createdAt?date}</em></p>
+
+        <h2>${post.summary}</h2>
+        <h3>${post.body}</h3>
+    </#list>
 </body>
 </html>

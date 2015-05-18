@@ -8,6 +8,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.wkh.fastblog.domain.Post;
+import org.wkh.fastblog.domain.PostRecord;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -26,14 +27,18 @@ public class CassandraPostDAO implements InitializingBean, DisposableBean {
     @NotNull
     private int replicationFactor;
 
+    @NotNull
+    private boolean dropOnStartup;
+
     private Cluster cluster;
     private Session session;
 
-    private String insertPostQuery = "INSERT INTO fastblog.posts (id, title, slug, body, summary, published, published_at, created_at) " +
+    private final String insertPostQuery = "INSERT INTO fastblog.posts (id, title, slug, body, summary, published, published_at, created_at) " +
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
     private PreparedStatement insertPostStatement;
 
-    private String fetchPostsQuery = "SELECT * FROM fastblog.posts";
+    private final String fetchPostsQuery = "SELECT * FROM fastblog.posts";
+    private BoundStatement fetchPostsStatement;
 
     public void setHost(String host) {
         this.host = host;
@@ -41,6 +46,10 @@ public class CassandraPostDAO implements InitializingBean, DisposableBean {
 
     public void setReplicationFactor(int replicationFactor) {
         this.replicationFactor = replicationFactor;
+    }
+
+    public void setDropOnStartup(boolean dropOnStartup) {
+        this.dropOnStartup = dropOnStartup;
     }
 
     @Override
@@ -57,6 +66,7 @@ public class CassandraPostDAO implements InitializingBean, DisposableBean {
         log.info("Created/updated schema");
 
         insertPostStatement = session.prepare(insertPostQuery);
+        fetchPostsStatement = session.prepare(fetchPostsQuery).bind();
     }
 
     @Override
@@ -70,23 +80,27 @@ public class CassandraPostDAO implements InitializingBean, DisposableBean {
         final String keyspaceCreationQuery = "CREATE KEYSPACE IF NOT EXISTS fastblog WITH replication " +
                 "= {'class':'SimpleStrategy', 'replication_factor':1};";
 
+        final String dropPostTableQuery = "DROP TABLE IF EXISTS fastblog.posts;";
 
         final String postTableCreationQuery = "CREATE TABLE IF NOT EXISTS fastblog.posts (" +
-                "id text," +
+                "id text primary key," +
                 "title text, " +
                 "slug text, " +
                 "body text, " +
                 "summary text, " +
                 "published boolean, " +
                 "published_at timestamp, " +
-                "created_at timestamp, " +
-                "PRIMARY KEY (id, created_at)" +
-                ") WITH CLUSTERING ORDER BY (created_at DESC);";
+                "created_at timestamp);";
 
         log.info("Creating keyspace with query: ");
         log.info(keyspaceCreationQuery);
 
         session.execute(keyspaceCreationQuery);
+
+        if (dropOnStartup) {
+            session.execute(dropPostTableQuery);
+            log.info("Dropped posts table");
+        }
 
         log.info("Creating posts table with query: ");
         log.info(postTableCreationQuery);
@@ -94,33 +108,31 @@ public class CassandraPostDAO implements InitializingBean, DisposableBean {
         session.execute(postTableCreationQuery);
 
         session.execute("CREATE INDEX IF NOT EXISTS posts_published ON fastblog.posts (published);");
-        session.execute("CREATE INDEX IF NOT EXISTS posts_published_at ON fastblog.posts (published_at);");
-        session.execute("CREATE INDEX IF NOT EXISTS posts_created_at ON fastblog.posts (created_at);");
     }
 
-    public void insert(Post post) {
+    public void insert(PostRecord postRecord) {
         Date publishedAt = null;
         
-        if (post.getPublishedAt() != null) {
-            publishedAt = new Date(post.getPublishedAt());
+        if (postRecord.getPublishedAt() != null) {
+            publishedAt = new Date(postRecord.getPublishedAt());
         }
 
         Date createdAt = null;
 
-        if (post.getCreatedAt() != null) {
-            createdAt = new Date(post.getCreatedAt());
+        if (postRecord.getCreatedAt() != null) {
+            createdAt = new Date(postRecord.getCreatedAt());
         }
 
         try {
             /* (id, title, slug, body, summary, published, published_at, created_at) */
 
             BoundStatement bound = insertPostStatement.bind(
-                    post.getId(),
-                    post.getTitle(),
-                    post.getSlug(),
-                    post.getBody(),
-                    post.getSummary(),
-                    post.getPublished(),
+                    postRecord.getId(),
+                    postRecord.getTitle(),
+                    postRecord.getSlug(),
+                    postRecord.getBody(),
+                    postRecord.getSummary(),
+                    postRecord.getPublished(),
                     publishedAt,
                     createdAt);
 
@@ -132,30 +144,32 @@ public class CassandraPostDAO implements InitializingBean, DisposableBean {
     }
 
     public List<Post> fetchAll() {
-        ResultSet results = session.execute(fetchPostsQuery);
+        return fetchAllByQuery(fetchPostsStatement);
+    }
+
+    private List<Post> fetchAllByQuery(BoundStatement query) {
+        ResultSet results = session.execute(query);
 
         List<Post> posts = new ArrayList<Post>();
 
         for(Row row : results.all()) {
-            Long publishedAt = null;
-
-            if (row.getDate("published_at") != null) {
-                publishedAt = row.getDate("published_at").getTime();
-            }
-
-            Post post = new Post(
-                    row.getString("id"),
-                    row.getDate("created_at").getTime(),
-                    row.getBool("published"),
-                    publishedAt,
-                    row.getString("title"),
-                    row.getString("body"),
-                    row.getString("summary"),
-                    row.getString("slug")
-            );
-
+            Post post = serializePost(row);
             posts.add(post);
         }
+
         return posts;
+    }
+
+    private Post serializePost(Row row) {
+        return new Post(
+                        row.getString("id"),
+                        row.getDate("created_at"),
+                        row.getBool("published"),
+                        row.getDate("published_at"),
+                        row.getString("title"),
+                        row.getString("body"),
+                        row.getString("summary"),
+                        row.getString("slug")
+                );
     }
 }

@@ -8,15 +8,15 @@ import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.avro.util.Utf8;
 import org.springframework.stereotype.Service;
-import org.wkh.fastblog.domain.Post;
+import org.wkh.fastblog.domain.PostRecord;
 
 import java.io.ByteArrayOutputStream;
 
 @Service
 public class SerializationService {
-    public static final Schema POST_SCHEMA = Post.getClassSchema();
+    public static final Schema POST_SCHEMA = PostRecord.getClassSchema();
 
-    public byte[] serializePost(Post post) throws Exception {
+    public byte[] serializePost(PostRecord post) throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(out, null);
         DatumWriter<GenericRecord> writer = new SpecificDatumWriter<GenericRecord>(POST_SCHEMA);
@@ -30,7 +30,7 @@ public class SerializationService {
         return out.toByteArray();
     }
 
-    public Post deserializePost(byte[] bytes) throws Exception {
+    public PostRecord deserializePost(byte[] bytes) throws Exception {
         SpecificDatumReader<GenericRecord> reader = new SpecificDatumReader<GenericRecord>(POST_SCHEMA);
 
         Decoder decoder = DecoderFactory.get().binaryDecoder(bytes, null);
@@ -44,23 +44,23 @@ public class SerializationService {
      *
      * @return GenericRecord
      */
-    public GenericRecord toRecord(Post post) {
+    public GenericRecord toRecord(PostRecord postRecord) {
         GenericRecord record = new GenericData.Record(POST_SCHEMA);
 
-        record.put("id", post.getId());
-        record.put("created_at", post.getCreatedAt());
-        record.put("published", post.getPublished());
+        record.put("id", postRecord.getId());
+        record.put("created_at", postRecord.getCreatedAt());
+        record.put("published", postRecord.getPublished());
 
-        if (post.getPublishedAt() != null) {
-            record.put("published_at", post.getPublishedAt());
+        if (postRecord.getPublishedAt() != null) {
+            record.put("published_at", postRecord.getPublishedAt());
         } else {
             record.put("published_at", null);
         }
 
-        record.put("title", post.getTitle());
-        record.put("body", post.getBody());
-        record.put("summary", post.getSummary());
-        record.put("slug", post.getSlug());
+        record.put("title", postRecord.getTitle());
+        record.put("body", postRecord.getBody());
+        record.put("summary", postRecord.getSummary());
+        record.put("slug", postRecord.getSlug());
 
         return record;
     }
@@ -70,7 +70,7 @@ public class SerializationService {
         return id.toString();
     }
 
-    public Post fromRecord(GenericRecord record) {
+    public PostRecord fromRecord(GenericRecord record) {
         Long createdAt = (Long)record.get("created_at");
 
         Long publishedAt = null;
@@ -79,7 +79,7 @@ public class SerializationService {
             publishedAt = (Long)record.get("published_at");
         }
 
-        Post post = new Post(
+        PostRecord postRecord = new PostRecord(
                 getStringFromAvroObject(record, "id"),
                 createdAt,
                 (Boolean) record.get("published"),
@@ -90,6 +90,6 @@ public class SerializationService {
                 getStringFromAvroObject(record, "slug")
         );
 
-        return post;
+        return postRecord;
     }
 }
