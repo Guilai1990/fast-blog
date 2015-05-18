@@ -7,7 +7,7 @@ package org.wkh.fastblog.domain;
 @SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class PostRecord extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"PostRecord\",\"namespace\":\"org.wkh.fastblog.domain\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"created_at\",\"type\":\"long\"},{\"name\":\"published\",\"type\":\"boolean\"},{\"name\":\"published_at\",\"type\":[\"null\",\"long\"]},{\"name\":\"title\",\"type\":\"string\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"summary\",\"type\":\"string\"},{\"name\":\"slug\",\"type\":\"string\"}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"PostRecord\",\"namespace\":\"org.wkh.fastblog.domain\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"created_at\",\"type\":\"long\"},{\"name\":\"published\",\"type\":\"boolean\"},{\"name\":\"published_at\",\"type\":[\"null\",\"long\"]},{\"name\":\"title\",\"type\":\"string\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"summary\",\"type\":\"string\"},{\"name\":\"slug\",\"type\":\"string\"},{\"name\":\"stored_in_rdbms\",\"type\":\"boolean\"}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
   @Deprecated public java.lang.CharSequence id;
   @Deprecated public long created_at;
@@ -17,6 +17,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
   @Deprecated public java.lang.CharSequence body;
   @Deprecated public java.lang.CharSequence summary;
   @Deprecated public java.lang.CharSequence slug;
+  @Deprecated public boolean stored_in_rdbms;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -28,7 +29,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
   /**
    * All-args constructor.
    */
-  public PostRecord(java.lang.CharSequence id, java.lang.Long created_at, java.lang.Boolean published, java.lang.Long published_at, java.lang.CharSequence title, java.lang.CharSequence body, java.lang.CharSequence summary, java.lang.CharSequence slug) {
+  public PostRecord(java.lang.CharSequence id, java.lang.Long created_at, java.lang.Boolean published, java.lang.Long published_at, java.lang.CharSequence title, java.lang.CharSequence body, java.lang.CharSequence summary, java.lang.CharSequence slug, java.lang.Boolean stored_in_rdbms) {
     this.id = id;
     this.created_at = created_at;
     this.published = published;
@@ -37,6 +38,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     this.body = body;
     this.summary = summary;
     this.slug = slug;
+    this.stored_in_rdbms = stored_in_rdbms;
   }
 
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
@@ -51,6 +53,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     case 5: return body;
     case 6: return summary;
     case 7: return slug;
+    case 8: return stored_in_rdbms;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -66,6 +69,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     case 5: body = (java.lang.CharSequence)value$; break;
     case 6: summary = (java.lang.CharSequence)value$; break;
     case 7: slug = (java.lang.CharSequence)value$; break;
+    case 8: stored_in_rdbms = (java.lang.Boolean)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -190,19 +194,34 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     this.slug = value;
   }
 
-  /** Creates a new Post RecordBuilder */
-  public static PostRecord.Builder newBuilder() {
-    return new PostRecord.Builder();
+  /**
+   * Gets the value of the 'stored_in_rdbms' field.
+   */
+  public java.lang.Boolean getStoredInRdbms() {
+    return stored_in_rdbms;
+  }
+
+  /**
+   * Sets the value of the 'stored_in_rdbms' field.
+   * @param value the value to set.
+   */
+  public void setStoredInRdbms(java.lang.Boolean value) {
+    this.stored_in_rdbms = value;
+  }
+
+  /** Creates a new PostRecord RecordBuilder */
+  public static org.wkh.fastblog.domain.PostRecord.Builder newBuilder() {
+    return new org.wkh.fastblog.domain.PostRecord.Builder();
   }
   
-  /** Creates a new Post RecordBuilder by copying an existing Builder */
-  public static PostRecord.Builder newBuilder(PostRecord.Builder other) {
-    return new PostRecord.Builder(other);
+  /** Creates a new PostRecord RecordBuilder by copying an existing Builder */
+  public static org.wkh.fastblog.domain.PostRecord.Builder newBuilder(org.wkh.fastblog.domain.PostRecord.Builder other) {
+    return new org.wkh.fastblog.domain.PostRecord.Builder(other);
   }
   
-  /** Creates a new Post RecordBuilder by copying an existing Post instance */
-  public static PostRecord.Builder newBuilder(PostRecord other) {
-    return new PostRecord.Builder(other);
+  /** Creates a new PostRecord RecordBuilder by copying an existing PostRecord instance */
+  public static org.wkh.fastblog.domain.PostRecord.Builder newBuilder(org.wkh.fastblog.domain.PostRecord other) {
+    return new org.wkh.fastblog.domain.PostRecord.Builder(other);
   }
   
   /**
@@ -219,14 +238,15 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     private java.lang.CharSequence body;
     private java.lang.CharSequence summary;
     private java.lang.CharSequence slug;
+    private boolean stored_in_rdbms;
 
     /** Creates a new Builder */
     private Builder() {
-      super(PostRecord.SCHEMA$);
+      super(org.wkh.fastblog.domain.PostRecord.SCHEMA$);
     }
     
     /** Creates a Builder by copying an existing Builder */
-    private Builder(PostRecord.Builder other) {
+    private Builder(org.wkh.fastblog.domain.PostRecord.Builder other) {
       super(other);
       if (isValidValue(fields()[0], other.id)) {
         this.id = data().deepCopy(fields()[0].schema(), other.id);
@@ -260,11 +280,15 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
         this.slug = data().deepCopy(fields()[7].schema(), other.slug);
         fieldSetFlags()[7] = true;
       }
+      if (isValidValue(fields()[8], other.stored_in_rdbms)) {
+        this.stored_in_rdbms = data().deepCopy(fields()[8].schema(), other.stored_in_rdbms);
+        fieldSetFlags()[8] = true;
+      }
     }
     
     /** Creates a Builder by copying an existing PostRecord instance */
-    private Builder(PostRecord other) {
-            super(PostRecord.SCHEMA$);
+    private Builder(org.wkh.fastblog.domain.PostRecord other) {
+            super(org.wkh.fastblog.domain.PostRecord.SCHEMA$);
       if (isValidValue(fields()[0], other.id)) {
         this.id = data().deepCopy(fields()[0].schema(), other.id);
         fieldSetFlags()[0] = true;
@@ -297,6 +321,10 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
         this.slug = data().deepCopy(fields()[7].schema(), other.slug);
         fieldSetFlags()[7] = true;
       }
+      if (isValidValue(fields()[8], other.stored_in_rdbms)) {
+        this.stored_in_rdbms = data().deepCopy(fields()[8].schema(), other.stored_in_rdbms);
+        fieldSetFlags()[8] = true;
+      }
     }
 
     /** Gets the value of the 'id' field */
@@ -305,7 +333,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     }
     
     /** Sets the value of the 'id' field */
-    public PostRecord.Builder setId(java.lang.CharSequence value) {
+    public org.wkh.fastblog.domain.PostRecord.Builder setId(java.lang.CharSequence value) {
       validate(fields()[0], value);
       this.id = value;
       fieldSetFlags()[0] = true;
@@ -318,7 +346,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     }
     
     /** Clears the value of the 'id' field */
-    public PostRecord.Builder clearId() {
+    public org.wkh.fastblog.domain.PostRecord.Builder clearId() {
       id = null;
       fieldSetFlags()[0] = false;
       return this;
@@ -330,7 +358,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     }
     
     /** Sets the value of the 'created_at' field */
-    public PostRecord.Builder setCreatedAt(long value) {
+    public org.wkh.fastblog.domain.PostRecord.Builder setCreatedAt(long value) {
       validate(fields()[1], value);
       this.created_at = value;
       fieldSetFlags()[1] = true;
@@ -343,7 +371,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     }
     
     /** Clears the value of the 'created_at' field */
-    public PostRecord.Builder clearCreatedAt() {
+    public org.wkh.fastblog.domain.PostRecord.Builder clearCreatedAt() {
       fieldSetFlags()[1] = false;
       return this;
     }
@@ -354,7 +382,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     }
     
     /** Sets the value of the 'published' field */
-    public PostRecord.Builder setPublished(boolean value) {
+    public org.wkh.fastblog.domain.PostRecord.Builder setPublished(boolean value) {
       validate(fields()[2], value);
       this.published = value;
       fieldSetFlags()[2] = true;
@@ -367,7 +395,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     }
     
     /** Clears the value of the 'published' field */
-    public PostRecord.Builder clearPublished() {
+    public org.wkh.fastblog.domain.PostRecord.Builder clearPublished() {
       fieldSetFlags()[2] = false;
       return this;
     }
@@ -378,7 +406,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     }
     
     /** Sets the value of the 'published_at' field */
-    public PostRecord.Builder setPublishedAt(java.lang.Long value) {
+    public org.wkh.fastblog.domain.PostRecord.Builder setPublishedAt(java.lang.Long value) {
       validate(fields()[3], value);
       this.published_at = value;
       fieldSetFlags()[3] = true;
@@ -391,7 +419,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     }
     
     /** Clears the value of the 'published_at' field */
-    public PostRecord.Builder clearPublishedAt() {
+    public org.wkh.fastblog.domain.PostRecord.Builder clearPublishedAt() {
       published_at = null;
       fieldSetFlags()[3] = false;
       return this;
@@ -403,7 +431,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     }
     
     /** Sets the value of the 'title' field */
-    public PostRecord.Builder setTitle(java.lang.CharSequence value) {
+    public org.wkh.fastblog.domain.PostRecord.Builder setTitle(java.lang.CharSequence value) {
       validate(fields()[4], value);
       this.title = value;
       fieldSetFlags()[4] = true;
@@ -416,7 +444,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     }
     
     /** Clears the value of the 'title' field */
-    public PostRecord.Builder clearTitle() {
+    public org.wkh.fastblog.domain.PostRecord.Builder clearTitle() {
       title = null;
       fieldSetFlags()[4] = false;
       return this;
@@ -428,7 +456,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     }
     
     /** Sets the value of the 'body' field */
-    public PostRecord.Builder setBody(java.lang.CharSequence value) {
+    public org.wkh.fastblog.domain.PostRecord.Builder setBody(java.lang.CharSequence value) {
       validate(fields()[5], value);
       this.body = value;
       fieldSetFlags()[5] = true;
@@ -441,7 +469,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     }
     
     /** Clears the value of the 'body' field */
-    public PostRecord.Builder clearBody() {
+    public org.wkh.fastblog.domain.PostRecord.Builder clearBody() {
       body = null;
       fieldSetFlags()[5] = false;
       return this;
@@ -453,7 +481,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     }
     
     /** Sets the value of the 'summary' field */
-    public PostRecord.Builder setSummary(java.lang.CharSequence value) {
+    public org.wkh.fastblog.domain.PostRecord.Builder setSummary(java.lang.CharSequence value) {
       validate(fields()[6], value);
       this.summary = value;
       fieldSetFlags()[6] = true;
@@ -466,7 +494,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     }
     
     /** Clears the value of the 'summary' field */
-    public PostRecord.Builder clearSummary() {
+    public org.wkh.fastblog.domain.PostRecord.Builder clearSummary() {
       summary = null;
       fieldSetFlags()[6] = false;
       return this;
@@ -478,7 +506,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     }
     
     /** Sets the value of the 'slug' field */
-    public PostRecord.Builder setSlug(java.lang.CharSequence value) {
+    public org.wkh.fastblog.domain.PostRecord.Builder setSlug(java.lang.CharSequence value) {
       validate(fields()[7], value);
       this.slug = value;
       fieldSetFlags()[7] = true;
@@ -491,9 +519,33 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
     }
     
     /** Clears the value of the 'slug' field */
-    public PostRecord.Builder clearSlug() {
+    public org.wkh.fastblog.domain.PostRecord.Builder clearSlug() {
       slug = null;
       fieldSetFlags()[7] = false;
+      return this;
+    }
+
+    /** Gets the value of the 'stored_in_rdbms' field */
+    public java.lang.Boolean getStoredInRdbms() {
+      return stored_in_rdbms;
+    }
+    
+    /** Sets the value of the 'stored_in_rdbms' field */
+    public org.wkh.fastblog.domain.PostRecord.Builder setStoredInRdbms(boolean value) {
+      validate(fields()[8], value);
+      this.stored_in_rdbms = value;
+      fieldSetFlags()[8] = true;
+      return this; 
+    }
+    
+    /** Checks whether the 'stored_in_rdbms' field has been set */
+    public boolean hasStoredInRdbms() {
+      return fieldSetFlags()[8];
+    }
+    
+    /** Clears the value of the 'stored_in_rdbms' field */
+    public org.wkh.fastblog.domain.PostRecord.Builder clearStoredInRdbms() {
+      fieldSetFlags()[8] = false;
       return this;
     }
 
@@ -509,6 +561,7 @@ public class PostRecord extends org.apache.avro.specific.SpecificRecordBase impl
         record.body = fieldSetFlags()[5] ? this.body : (java.lang.CharSequence) defaultValue(fields()[5]);
         record.summary = fieldSetFlags()[6] ? this.summary : (java.lang.CharSequence) defaultValue(fields()[6]);
         record.slug = fieldSetFlags()[7] ? this.slug : (java.lang.CharSequence) defaultValue(fields()[7]);
+        record.stored_in_rdbms = fieldSetFlags()[8] ? this.stored_in_rdbms : (java.lang.Boolean) defaultValue(fields()[8]);
         return record;
       } catch (Exception e) {
         throw new org.apache.avro.AvroRuntimeException(e);

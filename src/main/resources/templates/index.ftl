@@ -12,6 +12,14 @@
 
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+
+    <style type="text/css">
+      body {
+        font-family: 'Lato', sans-serif;
+      }
+    </style>
 </head>
 
 <body>

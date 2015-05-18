@@ -27,27 +27,27 @@ import kafka.message.MessageAndMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.wkh.fastblog.cassandra.CassandraPostDAO;
 import org.wkh.fastblog.domain.PostRecord;
+import org.wkh.fastblog.pg.PostDAO;
 import org.wkh.fastblog.serialization.SerializationService;
 
 @Component
-public class CassandraPostConsumerThread implements Runnable  {
-    private Logger log = LoggerFactory.getLogger(CassandraPostConsumerThread.class);
+public class PGPostConsumerThread implements Runnable  {
+    private Logger log = LoggerFactory.getLogger(PGPostConsumerThread.class);
     private KafkaStream stream;
     private ConsumerConnector consumerConnector;
-    private CassandraPostDAO dao;
+    private PostDAO dao;
 
-    public CassandraPostConsumerThread() {
+    public PGPostConsumerThread() {
 
     }
 
     private SerializationService serializationService;
 
-    public CassandraPostConsumerThread(KafkaStream stream,
-                                       SerializationService serializationService,
-                                       ConsumerConnector consumerConnector,
-                                       CassandraPostDAO dao) {
+    public PGPostConsumerThread(KafkaStream stream,
+                                SerializationService serializationService,
+                                ConsumerConnector consumerConnector,
+                                PostDAO dao) {
         this.stream = stream;
         this.serializationService = serializationService;
         this.consumerConnector = consumerConnector;
@@ -80,9 +80,9 @@ public class CassandraPostConsumerThread implements Runnable  {
                 continue;
             }
 
-            log.info("Going to try to send the post to Cassandra");
+            log.info("Going to try to send the post to Postgresql");
 
-            dao.insert(postRecord);
+            dao.insertRecord(postRecord);
 
             log.info("We got to after the insert call");
 

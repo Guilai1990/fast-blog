@@ -61,6 +61,7 @@ public class SerializationService {
         record.put("body", postRecord.getBody());
         record.put("summary", postRecord.getSummary());
         record.put("slug", postRecord.getSlug());
+        record.put("stored_in_rdbms", postRecord.getStoredInRdbms());
 
         return record;
     }
@@ -87,7 +88,8 @@ public class SerializationService {
                 getStringFromAvroObject(record, "title"),
                 getStringFromAvroObject(record, "body"),
                 getStringFromAvroObject(record, "summary"),
-                getStringFromAvroObject(record, "slug")
+                getStringFromAvroObject(record, "slug"),
+                (Boolean) record.get("stored_in_rdbms")
         );
 
         return postRecord;

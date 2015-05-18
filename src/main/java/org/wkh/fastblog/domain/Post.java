@@ -65,6 +65,7 @@ public class Post {
                 .setPublishedAt(null)
                 .setId(id)
                 .setSlug(slug)
+                .setStoredInRdbms(false)
                 .build();
 
         return postRecord;
