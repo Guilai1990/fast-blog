@@ -1,4 +1,4 @@
-package org.wkh.fastblog.services;
+package org.wkh.fastblog.kafka;
 
 import org.apache.kafka.clients.producer.*;
 import org.springframework.beans.factory.InitializingBean;
@@ -19,9 +19,6 @@ public class KafkaProducerService implements InitializingBean {
     private String groupId;
 
     @NotNull
-    private String producerReset;
-
-    @NotNull
     private String brokerList;
 
     private Producer<byte[], byte[]> producer;
@@ -34,10 +31,6 @@ public class KafkaProducerService implements InitializingBean {
         this.groupId = groupId;
     }
 
-    public void setProducerReset(String producerReset) {
-        this.producerReset = producerReset;
-    }
-
     public void setBrokerList(String brokerList) {
         this.brokerList = brokerList;
     }
@@ -48,7 +41,6 @@ public class KafkaProducerService implements InitializingBean {
 
         props.put("zookeeper.connect", zookeeper);
         props.put("group.id", groupId);
-        props.put("auto.offset.reset", producerReset);
         props.put("bootstrap.servers", brokerList);
         props.put("serializer.class", "org.apache.kafka.common.serialization.ByteArraySerializer");
         props.put("key.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer");

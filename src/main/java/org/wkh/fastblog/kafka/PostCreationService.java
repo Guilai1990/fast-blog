@@ -1,6 +1,5 @@
-package org.wkh.fastblog.services;
+package org.wkh.fastblog.kafka;
 
-import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.beans.factory.annotation.Autowired;

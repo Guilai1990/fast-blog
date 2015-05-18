@@ -17,36 +17,41 @@ Original license follows
  * limitations under the License.
  */
 
-package org.wkh.fastblog.services;
+package org.wkh.fastblog.kafka;
 
 import kafka.consumer.ConsumerIterator;
 import kafka.javaapi.consumer.ConsumerConnector;
-import org.apache.avro.generic.GenericRecord;
 
 import kafka.consumer.KafkaStream;
 import kafka.message.MessageAndMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.wkh.fastblog.cassandra.CassandraPostDAO;
 import org.wkh.fastblog.domain.Post;
 import org.wkh.fastblog.serialization.SerializationService;
 
 @Component
-public class PostConsumerThread implements Runnable {
-    private Logger log = LoggerFactory.getLogger(PostConsumerThread.class);
+public class CassandraPostConsumerThread implements Runnable  {
+    private Logger log = LoggerFactory.getLogger(CassandraPostConsumerThread.class);
     private KafkaStream stream;
     private ConsumerConnector consumerConnector;
+    private CassandraPostDAO dao;
 
-    public PostConsumerThread() {
+    public CassandraPostConsumerThread() {
 
     }
 
     private SerializationService serializationService;
 
-    public PostConsumerThread(KafkaStream stream, SerializationService serializationService, ConsumerConnector consumerConnector) {
+    public CassandraPostConsumerThread(KafkaStream stream,
+                                       SerializationService serializationService,
+                                       ConsumerConnector consumerConnector,
+                                       CassandraPostDAO dao) {
         this.stream = stream;
         this.serializationService = serializationService;
         this.consumerConnector = consumerConnector;
+        this.dao = dao;
     }
 
     public void run() {
@@ -65,11 +70,20 @@ public class PostConsumerThread implements Runnable {
 
             log.info("Going to deserialize post");
 
+            Post post;
+
             try {
-                Post post = serializationService.deserializePost(message);
+                post = serializationService.deserializePost(message);
             } catch(Exception e) {
                 log.error("Error trying to deserialize post!");
+                continue;
             }
+
+            log.info("Going to try to send the post to Cassandra");
+
+            dao.insert(post);
+
+            log.info("We got to after the insert call");
 
             consumerConnector.commitOffsets();
         }

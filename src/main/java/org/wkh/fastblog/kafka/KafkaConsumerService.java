@@ -18,7 +18,7 @@ Original license follows
  * limitations under the License.
  */
 
-package org.wkh.fastblog.services;
+package org.wkh.fastblog.kafka;
 
 import kafka.consumer.ConsumerConfig;import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
@@ -37,6 +37,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
+import org.wkh.fastblog.cassandra.CassandraPostDAO;
 import org.wkh.fastblog.serialization.SerializationService;
 
 import javax.validation.constraints.NotNull;
@@ -68,6 +69,8 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
     @Autowired
     private SerializationService serializationService;
 
+    @Autowired
+    private CassandraPostDAO dao;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -97,7 +100,6 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
         topicCountMap.put(postsTopic, threadCount);
 
         Properties props = createConsumerConfig();
-        VerifiableProperties vProps = new VerifiableProperties(props);
 
         Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap =
                 consumer.createMessageStreams(topicCountMap);
@@ -108,7 +110,7 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
 
         // Create PostConsumerThread objects and bind them to threads
         for (final KafkaStream stream : streams) {
-            executor.submit(new PostConsumerThread(stream, serializationService, consumer));
+            executor.submit(new CassandraPostConsumerThread(stream, serializationService, consumer, dao));
         }
     }
 

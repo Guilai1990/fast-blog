@@ -21,19 +21,17 @@
                 </#if>
             </#if>
 
-            <table>
+            <table class="table">
               <tr>
-                <th>ID</th>
                 <th>Title</th>
-                <th>Body</th>
-                <th>Slug</th>
+                <th>Published</th>
+                <th>Date created</th>
               </tr>
               <#list posts as post>
                 <tr>
-                  <th>${post.id}</th>
                   <th>${post.title}</th>
-                  <th>${post.body}</th>
-                  <th>${post.slug}</th>
+                  <th>${post.published?c}</th>
+                  <th>${post.createdAt}</th>
                 </tr>
               </#list>
             </table>
