@@ -6,7 +6,7 @@ An attempt at making a high-performance blog engine that makes extensive use of 
 The current attempt is to try to use [Apache Kafka](http://kafka.apache.org/) to store data and then [generate materialized views off of it using a stream 
 processor](http://blog.confluent.io/2015/03/04/turning-the-database-inside-out-with-apache-samza/).
 
-Currently this is extremely early in its development and basically useless. Check back in a couple weeks or months! :)
+I'm not sure how far I'll go with this.
 
 This project is some extent merely a testbed for playing with new and old techologies, eventually likely including:
 
