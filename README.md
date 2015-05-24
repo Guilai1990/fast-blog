@@ -12,7 +12,6 @@ This project is some extent merely a testbed for playing with new and old techol
 
 * [Spring Boot](http://projects.spring.io/spring-boot/)
 * [Apache Kafka](http://kafka.apache.org/)
-* 
 * [Apache Avro](https://avro.apache.org/)
 * [Apache Cassandra](http://cassandra.apache.org/)
 
