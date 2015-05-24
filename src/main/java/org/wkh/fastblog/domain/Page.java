@@ -3,6 +3,9 @@ package org.wkh.fastblog.domain;
 import javax.validation.constraints.NotNull;
 
 public class Page {
+    public static final String HOMEPAGE = "homepage";
+    public static final String HOMEPAGE_ADMIN = "homepage-admin";
+
     @NotNull
     private final String id;
     @NotNull

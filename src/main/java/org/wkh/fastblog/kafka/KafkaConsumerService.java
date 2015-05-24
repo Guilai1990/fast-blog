@@ -40,14 +40,16 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 import org.wkh.fastblog.cassandra.CassandraPostConsumerThread;
-import org.wkh.fastblog.cassandra.CassandraDAO;
+import org.wkh.fastblog.cassandra.PageDAO;
+import org.wkh.fastblog.cassandra.PostDAO;
+import org.wkh.fastblog.renderers.HomepageRenderer;
 import org.wkh.fastblog.serialization.SerializationService;
 
 import javax.validation.constraints.NotNull;
 
 @Service
 @ConfigurationProperties(prefix="kafka")
-public class KafkaConsumerService implements InitializingBean, DisposableBean, ApplicationContextAware {
+public class KafkaConsumerService implements InitializingBean, DisposableBean {
     private Logger log = LoggerFactory.getLogger(KafkaConsumerService.class);
 
     @NotNull
@@ -73,9 +75,9 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean, A
     private SerializationService serializationService;
 
     @Autowired
-    private CassandraDAO dao;
-
-    private ApplicationContext context;
+    private PostDAO postDAO;
+    @Autowired
+    private HomepageRenderer homepageRenderer;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -115,7 +117,7 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean, A
 
         // Create PostConsumerThread objects and bind them to threads
         for (final KafkaStream stream : streams) {
-            executor.submit(new CassandraPostConsumerThread(stream, serializationService, consumer, dao, context));
+            executor.submit(new CassandraPostConsumerThread(stream, serializationService, consumer, postDAO, homepageRenderer));
         }
     }
 
@@ -152,10 +154,5 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean, A
 
     public void setThreadCount(Integer threadCount) {
         this.threadCount = threadCount;
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        context = applicationContext;
     }
 }
