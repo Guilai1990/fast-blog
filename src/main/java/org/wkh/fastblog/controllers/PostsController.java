@@ -1,20 +1,17 @@
 package org.wkh.fastblog.controllers;
 
 import org.apache.kafka.clients.producer.RecordMetadata;
-import org.springframework.beans.BeansException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wkh.fastblog.cassandra.CassandraPostDAO;
+import org.wkh.fastblog.cassandra.CassandraDAO;
 import org.wkh.fastblog.domain.PostHelper;
 import org.wkh.fastblog.domain.Post;
 import org.wkh.fastblog.kafka.PostCreationService;
@@ -23,58 +20,31 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 @Controller
-public class PostsController implements ApplicationContextAware {
-    private static final String SECURITY_PROPERTIES = "securityProperties";
-    private String adminUsername;
+public class PostsController {
+    private Logger log = LoggerFactory.getLogger(PostsController.class);
 
     private final PostCreationService postCreationService;
-    private final CassandraPostDAO dao;
+    private final CassandraDAO dao;
 
     @Autowired
-    public PostsController(PostCreationService postCreationService, CassandraPostDAO dao) {
+    public PostsController(PostCreationService postCreationService, CassandraDAO dao) {
         this.postCreationService = postCreationService;
         this.dao = dao;
     }
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        SecurityProperties securityProperties = (SecurityProperties) applicationContext.getBean(SECURITY_PROPERTIES);
-        adminUsername = securityProperties.getUser().getName();
-    }
+    @RequestMapping(value = "/", produces = "text/html")
+    @ResponseBody
+    public String viewPosts() {
+        final String homepage = dao.fetchPageBody("homepage");
 
-    @RequestMapping("/")
-    public String viewPosts(Model model) {
-        boolean isAdmin = isAdmin();
+        log.info("Got for homepage:" + homepage);
 
-        model.addAttribute("isAdmin", isAdmin);
-
-        List<Post> postRecords = dao.fetchAll();
-
-        model.addAttribute("posts", postRecords);
-
-        return "index";
-    }
-
-    private boolean isAdmin() {
-        if (adminUsername == null) {
-            return false;
-        }
-
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username;
-
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails)principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
-
-        return username.equals(adminUsername);
+        return homepage;
     }
 
     @RequestMapping(value = "/posts", method = RequestMethod.GET)
     public String listPosts(Model model) throws Exception {
-        List<Post> postRecords = dao.fetchAll();
+        List<Post> postRecords = dao.fetchAllPosts();
 
         model.addAttribute("posts", postRecords);
 

@@ -19,6 +19,8 @@ Original license follows
 
 package org.wkh.fastblog.cassandra;
 
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import kafka.consumer.ConsumerIterator;
 import kafka.javaapi.consumer.ConsumerConnector;
 
@@ -26,17 +28,28 @@ import kafka.consumer.KafkaStream;
 import kafka.message.MessageAndMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
+import org.wkh.fastblog.domain.Page;
 import org.wkh.fastblog.domain.PostHelper;
 import org.wkh.fastblog.domain.Post;
+import org.wkh.fastblog.helper.AdminService;
 import org.wkh.fastblog.serialization.SerializationService;
 
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Component
-public class CassandraPostConsumerThread implements Runnable  {
+public class CassandraPostConsumerThread implements Runnable   {
     private Logger log = LoggerFactory.getLogger(CassandraPostConsumerThread.class);
     private KafkaStream stream;
     private ConsumerConnector consumerConnector;
-    private CassandraPostDAO dao;
+    private CassandraDAO dao;
+    private ApplicationContext context;
 
     public CassandraPostConsumerThread() {
     }
@@ -46,11 +59,13 @@ public class CassandraPostConsumerThread implements Runnable  {
     public CassandraPostConsumerThread(KafkaStream stream,
                                        SerializationService serializationService,
                                        ConsumerConnector consumerConnector,
-                                       CassandraPostDAO dao) {
+                                       CassandraDAO dao,
+                                       ApplicationContext context) {
         this.stream = stream;
         this.serializationService = serializationService;
         this.consumerConnector = consumerConnector;
         this.dao = dao;
+        this.context = context;
     }
 
     public void run() {
@@ -94,6 +109,33 @@ public class CassandraPostConsumerThread implements Runnable  {
 
             log.info("We got to after the insert call");
 
+            List<Post> posts = dao.fetchAllPosts();
+            boolean isAdmin = AdminService.isAdmin();
+
+            Map<String, Object> model= new HashMap<String, Object>();
+            model.put("posts", posts);
+            model.put("isAdmin", isAdmin);
+
+            FreeMarkerConfig config = BeanFactoryUtils.beanOfTypeIncludingAncestors(
+                    context, FreeMarkerConfig.class, true, false);
+            Configuration cfg = config.getConfiguration();
+
+            try {
+                Template template = cfg.getTemplate("index.ftl");
+                StringWriter writer = new StringWriter();
+
+                template.process(model, writer);
+
+                String renderedPage = writer.toString();
+
+                log.info("Rendered page: " + renderedPage);
+
+                Page homepage = new Page("homepage", renderedPage);
+
+                dao.insertPage(homepage);
+            } catch (Exception e) {
+                log.error(e.toString());
+            }
             consumerConnector.commitOffsets();
         }
 
