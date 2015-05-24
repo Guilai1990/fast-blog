@@ -36,7 +36,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
-import org.wkh.fastblog.pg.PostDAO;
+import org.wkh.fastblog.cassandra.CassandraPostConsumerThread;
+import org.wkh.fastblog.cassandra.CassandraPostDAO;
 import org.wkh.fastblog.serialization.SerializationService;
 
 import javax.validation.constraints.NotNull;
@@ -69,7 +70,7 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
     private SerializationService serializationService;
 
     @Autowired
-    private PostDAO dao;
+    private CassandraPostDAO dao;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -109,7 +110,7 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
 
         // Create PostConsumerThread objects and bind them to threads
         for (final KafkaStream stream : streams) {
-            executor.submit(new PGPostConsumerThread(stream, serializationService, consumer, dao));
+            executor.submit(new CassandraPostConsumerThread(stream, serializationService, consumer, dao));
         }
     }
 

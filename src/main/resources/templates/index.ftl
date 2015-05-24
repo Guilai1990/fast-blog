@@ -13,32 +13,35 @@
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
-    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
 
     <style type="text/css">
       body {
-        font-family: 'Lato', sans-serif;
+        font-family: 'Open Sans', sans-serif;
       }
     </style>
 </head>
 
 <body>
-    <p>Hi there!</p>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <#if isAdmin>
+                    <p>You're an admin!</p>
+                <#else>
+                    <p>You're a normal user! Thanks for visiting!</p>
+                </#if>
 
-    <p>Admin? ${isAdmin?c}</p>
+                <#list posts as post>
+                    <h1>${post.title}</h1>
+                    <p><em>${post.createdAt?number_to_date}</em></p>
 
-    <#if isAdmin>
-        <p>You're an admin!</p>
-    <#else>
-        <p>You're a normal user! Thanks for visiting!</p>
-    </#if>
+                    <h4><em>${post.summary}</em></h4>
 
-    <#list posts as post>
-        <h1>${post.title}</h1>
-        <p><em>${post.createdAt?date}</em></p>
-
-        <h2>${post.summary}</h2>
-        <h3>${post.body}</h3>
-    </#list>
+                    <p>${post.body}</p>
+                </#list>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

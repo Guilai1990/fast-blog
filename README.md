@@ -8,20 +8,19 @@ processor](http://blog.confluent.io/2015/03/04/turning-the-database-inside-out-w
 
 Currently this is extremely early in its development and basically useless. Check back in a couple weeks or months! :)
 
-This project is some extent merely a testbed for playing with new and old techologies, eventually likely including:
+This project is some extent merely a testbed for playing with new and old techologies, including:
 
 * [Spring Boot](http://projects.spring.io/spring-boot/)
 * [Apache Kafka](http://kafka.apache.org/)
-* [PostgreSQL](http://www.postgresql.org/)
-* [Apache Solr](http://lucene.apache.org/solr/)
+* 
 * [Apache Avro](https://avro.apache.org/)
-* [Redis](http://redis.io/)
-* [Apache Storm](https://storm.apache.org/)
+* [Apache Cassandra](http://cassandra.apache.org/)
 
+Usage of [Apache Solr](http://lucene.apache.org/solr/) and [Apache Spark](http://spark.apache.org) is planned.
 The shell scripts in `bin` assume you have an environment variable `$KAFKA_HOME` set to the installation directory
 of the [Confluent Platform](http://confluent.io/docs/current/index.html). Follow the 
 [quickstart](http://confluent.io/docs/current/quickstart.html) they have to install and run ZooKeeper and Kafka.
-You'll need to run Kafka (and therefore ZooKeeper) to start up the application.
+You'll need to run Kafka (and therefore ZooKeeper) to start up the application. You'll also need Cassandra running.
 
 Make a topic that's [log-compacted](https://cwiki.apache.org/confluence/display/KAFKA/Log+Compaction) called posts:
 

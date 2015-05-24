@@ -31,7 +31,7 @@
                 <tr>
                   <th>${post.title}</th>
                   <th>${post.published?c}</th>
-                  <th>${post.createdAt?date}</th>
+                  <th>${post.createdAt?number_to_datetime}</th>
                 </tr>
               </#list>
             </table>

@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.wkh.fastblog.cassandra.CassandraPostDAO;
+import org.wkh.fastblog.domain.PostHelper;
 import org.wkh.fastblog.domain.Post;
-import org.wkh.fastblog.domain.PostRecord;
-import org.wkh.fastblog.pg.PostDAO;
 import org.wkh.fastblog.kafka.PostCreationService;
 
 import java.util.List;
@@ -28,10 +28,10 @@ public class PostsController implements ApplicationContextAware {
     private String adminUsername;
 
     private final PostCreationService postCreationService;
-    private final PostDAO dao;
+    private final CassandraPostDAO dao;
 
     @Autowired
-    public PostsController(PostCreationService postCreationService, PostDAO dao) {
+    public PostsController(PostCreationService postCreationService, CassandraPostDAO dao) {
         this.postCreationService = postCreationService;
         this.dao = dao;
     }
@@ -90,7 +90,7 @@ public class PostsController implements ApplicationContextAware {
                              @RequestParam(value = "title", required = true) String title,
                              @RequestParam(value = "summary") String summary,
                              final RedirectAttributes redirectAttributes) throws Exception {
-        PostRecord postRecord = Post.fromForm(title, body, summary);
+        Post postRecord = PostHelper.fromForm(title, body, summary);
 
         Future<RecordMetadata> result = postCreationService.create(postRecord);
 

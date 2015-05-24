@@ -17,7 +17,7 @@ Original license follows
  * limitations under the License.
  */
 
-package org.wkh.fastblog.kafka;
+package org.wkh.fastblog.cassandra;
 
 import kafka.consumer.ConsumerIterator;
 import kafka.javaapi.consumer.ConsumerConnector;
@@ -27,27 +27,26 @@ import kafka.message.MessageAndMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.wkh.fastblog.domain.PostRecord;
-import org.wkh.fastblog.pg.PostDAO;
+import org.wkh.fastblog.domain.PostHelper;
+import org.wkh.fastblog.domain.Post;
 import org.wkh.fastblog.serialization.SerializationService;
 
 @Component
-public class PGPostConsumerThread implements Runnable  {
-    private Logger log = LoggerFactory.getLogger(PGPostConsumerThread.class);
+public class CassandraPostConsumerThread implements Runnable  {
+    private Logger log = LoggerFactory.getLogger(CassandraPostConsumerThread.class);
     private KafkaStream stream;
     private ConsumerConnector consumerConnector;
-    private PostDAO dao;
+    private CassandraPostDAO dao;
 
-    public PGPostConsumerThread() {
-
+    public CassandraPostConsumerThread() {
     }
 
     private SerializationService serializationService;
 
-    public PGPostConsumerThread(KafkaStream stream,
-                                SerializationService serializationService,
-                                ConsumerConnector consumerConnector,
-                                PostDAO dao) {
+    public CassandraPostConsumerThread(KafkaStream stream,
+                                       SerializationService serializationService,
+                                       ConsumerConnector consumerConnector,
+                                       CassandraPostDAO dao) {
         this.stream = stream;
         this.serializationService = serializationService;
         this.consumerConnector = consumerConnector;
@@ -70,17 +69,26 @@ public class PGPostConsumerThread implements Runnable  {
 
             log.info("Going to deserialize post");
 
-            PostRecord postRecord;
+            Post postRecord;
 
             try {
                 postRecord = serializationService.deserializePost(message);
+
+                if(postRecord.getInitialOffset() == 0) {
+                    postRecord.setInitialOffset(record.offset());
+                }
+
+                final String slug = PostHelper.generateSlug(record.offset(), (String) postRecord.getTitleSlug());
+
+                postRecord.setSlug(slug);
+
             } catch(Exception e) {
                 log.error("Error trying to deserialize post!");
                 log.error(e.toString());
                 continue;
             }
 
-            log.info("Going to try to send the post to Postgresql");
+            log.info("Going to try to send the post to Cassandra");
 
             dao.insertRecord(postRecord);
 

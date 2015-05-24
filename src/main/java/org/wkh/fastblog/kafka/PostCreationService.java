@@ -5,7 +5,7 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-import org.wkh.fastblog.domain.PostRecord;
+import org.wkh.fastblog.domain.Post;
 import org.wkh.fastblog.serialization.SerializationService;
 
 import javax.validation.constraints.NotNull;
@@ -29,7 +29,7 @@ public class PostCreationService {
         this.postsTopic = postsTopic;
     }
 
-    public Future<RecordMetadata> create(PostRecord postRecord) throws Exception {
+    public Future<RecordMetadata> create(Post postRecord) throws Exception {
         byte[] serialized = serializationService.serializePost(postRecord);
 
         ProducerRecord<byte[], byte[]> kafkaRecord = new ProducerRecord<byte[], byte[]>(
