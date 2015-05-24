@@ -21,9 +21,10 @@ So, this isn't how I'd actually architect a simple application. For a simple app
 PostgreSQL. :)
 
 The shell scripts in `bin` assume you have an environment variable `$KAFKA_HOME` set to the installation directory
-of the [Confluent Platform](http://confluent.io/docs/current/index.html). Follow the 
-[quickstart](http://confluent.io/docs/current/quickstart.html) they have to install and run ZooKeeper and Kafka.
-You'll need to run Kafka (and therefore ZooKeeper) to start up the application. You'll also need Cassandra running.
+of Kafka. Follow the 
+[quickstart](http://kafka.apache.org/documentation.html#quickstart) instructions to install and run ZooKeeper and Kafka 
+if you haven't before. You'll need to run Kafka (and therefore ZooKeeper) to start up the application. You'll also need 
+Cassandra running. I'm not currently using the Schema Registry, so that's not needed.
 
 Make a topic that's [log-compacted](https://cwiki.apache.org/confluence/display/KAFKA/Log+Compaction) called posts:
 
