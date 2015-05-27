@@ -4,6 +4,7 @@ To do
 * Cleanup duplication of Kafka consumers/threads
 * Cleanup hardcoded strings in ElasticSearchService
 * Add health checks for ZK, Kafka, Cassandra, ES
+* Add rerender button to admin view
 * Realtime streaming analytics in admin page
 * Figure out how to do integration testing of this stuff
 * Implement publishing (only show published posts on the homepage as well)
