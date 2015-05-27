@@ -29,7 +29,7 @@
             <h1>Showing search results for <kbd>${query}</kbd></h1>
 
             <#list posts as post>
-                <h1>${post.title}</h1>
+                <h2>${post.title}</h2>
                 <p><em>${post.createdAt?number_to_date}</em></p>
 
                 <h4><em>${post.summary}</em></h4>
