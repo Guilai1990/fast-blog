@@ -3,17 +3,17 @@
     "type": "record",
     "name": "Post",
     "fields": [
-        {"name": "id", "type": "string"},
-        {"name": "initial_offset", "type": "long"},
-        {"name": "created_at", "type": "long"},
-        {"name": "published", "type": "boolean"},
-        {"name": "published_at", "type": "long"},
-        {"name": "updated_at", "type": "long"},
-        {"name": "title", "type": "string"},
-        {"name": "body", "type": "string"},
-        {"name": "summary", "type": "string"},
-        {"name": "title_slug", "type": "string"},
-        {"name": "slug", "type": "string"},
-        {"name": "soft_deleted", "type": "boolean"}
+        {"name": "id", "type": "string", "default": ""},
+        {"name": "initial_offset", "type": "long", "default": 0},
+        {"name": "created_at", "type": "long", "default": 0},
+        {"name": "published", "type": "boolean", "default": false},
+        {"name": "published_at", "type": "long", "default": 0},
+        {"name": "updated_at", "type": "long", "default": 0},
+        {"name": "title", "type": "string", "default": ""},
+        {"name": "body", "type": "string", "default": ""},
+        {"name": "summary", "type": "string", "default": ""},
+        {"name": "title_slug", "type": "string", "default": ""},
+        {"name": "slug", "type": "string", "default": ""},
+        {"name": "soft_deleted", "type": "boolean", "default": false}
     ]
 }

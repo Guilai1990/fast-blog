@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.wkh.fastblog.domain.Post;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class SerializationService {
@@ -39,11 +41,25 @@ public class SerializationService {
         return fromRecord(record);
     }
 
-    /**
-     * Serialize this post to an Avro record.
-     *
-     * @return GenericRecord
-     */
+    public Map<String, Object> toMap(Post post) {
+        Map<String, Object> record = new HashMap<String, Object>();
+
+        record.put("id", post.getId());
+        record.put("initial_offset", post.getInitialOffset());
+        record.put("created_at", post.getCreatedAt());
+        record.put("published", post.getPublished());
+        record.put("published_at", post.getPublishedAt());
+        record.put("updated_at", post.getUpdatedAt());
+        record.put("title", post.getTitle());
+        record.put("body", post.getBody());
+        record.put("summary", post.getSummary());
+        record.put("title_slug", post.getTitleSlug());
+        record.put("slug", post.getSlug());
+        record.put("soft_deleted", post.getSoftDeleted());
+
+        return record;
+    }
+
     public GenericRecord toRecord(Post post) {
         GenericRecord record = new GenericData.Record(POST_SCHEMA);
 

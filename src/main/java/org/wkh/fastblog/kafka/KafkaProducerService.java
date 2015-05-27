@@ -16,19 +16,12 @@ public class KafkaProducerService implements InitializingBean {
     private String zookeeper;
 
     @NotNull
-    private String groupId;
-
-    @NotNull
     private String brokerList;
 
     private Producer<byte[], byte[]> producer;
 
     public void setZookeeper(String zookeeper) {
         this.zookeeper = zookeeper;
-    }
-
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
     }
 
     public void setBrokerList(String brokerList) {
@@ -40,7 +33,6 @@ public class KafkaProducerService implements InitializingBean {
         Properties props = new Properties();
 
         props.put("zookeeper.connect", zookeeper);
-        props.put("group.id", groupId);
         props.put("bootstrap.servers", brokerList);
         props.put("serializer.class", "org.apache.kafka.common.serialization.ByteArraySerializer");
         props.put("key.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer");

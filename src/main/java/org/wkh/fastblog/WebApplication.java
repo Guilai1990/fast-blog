@@ -26,6 +26,7 @@ public class WebApplication {
             /* GET / can be viewed by anyone. everything else requires HTTP basic auth */
             http.authorizeRequests()
                     .antMatchers("/").permitAll()
+                    .antMatchers("/search").permitAll()
                     .anyRequest().authenticated().and().httpBasic();
         }
     }

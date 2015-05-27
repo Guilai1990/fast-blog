@@ -1,6 +1,7 @@
 package org.wkh.fastblog.controllers;
 
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.elasticsearch.search.SearchHit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -22,6 +23,7 @@ import org.wkh.fastblog.cassandra.PostDAO;
 import org.wkh.fastblog.domain.Page;
 import org.wkh.fastblog.domain.PostHelper;
 import org.wkh.fastblog.domain.Post;
+import org.wkh.fastblog.elasticsearch.ElasticSearchService;
 import org.wkh.fastblog.kafka.PostCreationService;
 
 import java.util.List;
@@ -35,12 +37,15 @@ public class PostsController implements ApplicationContextAware {
     private Logger log = LoggerFactory.getLogger(PostsController.class);
 
     private final PostCreationService postCreationService;
+    private final ElasticSearchService elasticSearch;
     private final PostDAO postDAO;
     private final PageDAO pageDAO;
 
     @Autowired
-    public PostsController(PostCreationService postCreationService, PostDAO postDAO, PageDAO pageDAO) {
+    public PostsController(PostCreationService postCreationService, ElasticSearchService elasticSearch,
+                           PostDAO postDAO, PageDAO pageDAO) {
         this.postCreationService = postCreationService;
+        this.elasticSearch = elasticSearch;
         this.postDAO = postDAO;
         this.pageDAO = pageDAO;
     }
@@ -68,6 +73,16 @@ public class PostsController implements ApplicationContextAware {
         return username.equals(adminUsername);
     }
 
+    @RequestMapping(value = "/search", method=RequestMethod.GET)
+    public String search(@RequestParam(value = "q") String query, Model model) {
+        List<Post> posts = elasticSearch.searchForString(query);
+
+        model.addAttribute("query", query);
+        model.addAttribute("posts", posts);
+
+        return "search";
+    }
+
     @RequestMapping(value = "/", produces = "text/html")
     @ResponseBody
     public String viewPosts() {
@@ -86,6 +101,7 @@ public class PostsController implements ApplicationContextAware {
 
         return "post_list";
     }
+
     @RequestMapping(value = "/posts/new", method = RequestMethod.GET)
     public String createPostView() {
         return "edit_new_post";

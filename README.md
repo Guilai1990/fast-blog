@@ -14,8 +14,9 @@ This project is some extent merely a testbed for playing with stuff, including:
 * [Apache Kafka](http://kafka.apache.org/)
 * [Apache Avro](https://avro.apache.org/)
 * [Apache Cassandra](http://cassandra.apache.org/)
+* [Elasticsearch](https://www.elastic.co/products/elasticsearch)
 
-Usage of [Apache Solr](http://lucene.apache.org/solr/) and [Apache Spark](http://spark.apache.org) is planned.
+Usage of [Apache Spark](http://spark.apache.org) or something similar is planned.
 
 So, this isn't how I'd actually architect a simple application. For a simple application, I'd just use Spring Boot and 
 PostgreSQL. :)
@@ -24,7 +25,7 @@ The shell scripts in `bin` assume you have an environment variable `$KAFKA_HOME`
 of Kafka. Follow the 
 [quickstart](http://kafka.apache.org/documentation.html#quickstart) instructions to install and run ZooKeeper and Kafka 
 if you haven't before. You'll need to run Kafka (and therefore ZooKeeper) to start up the application. You'll also need 
-Cassandra running.
+Cassandra and Elasticsearch running.
 
 Make a topic that's [log-compacted](https://cwiki.apache.org/confluence/display/KAFKA/Log+Compaction) called posts:
 

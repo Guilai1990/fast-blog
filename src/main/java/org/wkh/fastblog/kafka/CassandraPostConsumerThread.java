@@ -17,7 +17,7 @@ Original license follows
  * limitations under the License.
  */
 
-package org.wkh.fastblog.cassandra;
+package org.wkh.fastblog.kafka;
 
 import kafka.consumer.ConsumerIterator;
 import kafka.javaapi.consumer.ConsumerConnector;
@@ -26,8 +26,8 @@ import kafka.consumer.KafkaStream;
 import kafka.message.MessageAndMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.wkh.fastblog.cassandra.PostDAO;
 import org.wkh.fastblog.domain.PostHelper;
 import org.wkh.fastblog.domain.Post;
 import org.wkh.fastblog.renderers.HomepageRenderer;
@@ -38,13 +38,13 @@ public class CassandraPostConsumerThread implements Runnable   {
     private Logger log = LoggerFactory.getLogger(CassandraPostConsumerThread.class);
     private KafkaStream stream;
     private ConsumerConnector consumerConnector;
+    private SerializationService serializationService;
     private PostDAO postDAO;
     private HomepageRenderer homepageRenderer;
 
     public CassandraPostConsumerThread() {
     }
 
-    private SerializationService serializationService;
 
     public CassandraPostConsumerThread(KafkaStream stream,
                                        SerializationService serializationService,
@@ -59,7 +59,7 @@ public class CassandraPostConsumerThread implements Runnable   {
     }
 
     public void run() {
-        log.info("Consumer thread started");
+        log.info("Cassandra consumer thread started");
 
         ConsumerIterator<byte[], byte[]> it = stream.iterator();
 

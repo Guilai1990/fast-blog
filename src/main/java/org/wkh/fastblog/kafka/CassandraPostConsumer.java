@@ -31,16 +31,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
-import org.wkh.fastblog.cassandra.CassandraPostConsumerThread;
-import org.wkh.fastblog.cassandra.PageDAO;
 import org.wkh.fastblog.cassandra.PostDAO;
 import org.wkh.fastblog.renderers.HomepageRenderer;
 import org.wkh.fastblog.serialization.SerializationService;
@@ -49,14 +44,14 @@ import javax.validation.constraints.NotNull;
 
 @Service
 @ConfigurationProperties(prefix="kafka")
-public class KafkaConsumerService implements InitializingBean, DisposableBean {
-    private Logger log = LoggerFactory.getLogger(KafkaConsumerService.class);
+public class CassandraPostConsumer implements InitializingBean, DisposableBean {
+    private Logger log = LoggerFactory.getLogger(CassandraPostConsumer.class);
 
     @NotNull
     private String zookeeper;
 
     @NotNull
-    private String groupId;
+    private String cassandraGroupId;
 
     @NotNull
     private String consumerReset;
@@ -81,13 +76,6 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if (postsTopic == null) {
-            log.error("postsTopic is null! Can't make Kafka consumer!");
-            return;
-        } else {
-            log.info("postsTopic set to: " + postsTopic);
-        }
-
         consumer = kafka.consumer.Consumer.createJavaConsumerConnector(new ConsumerConfig(createConsumerConfig()));
 
         run();
@@ -96,7 +84,7 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
     private Properties createConsumerConfig() {
         Properties props = new Properties();
         props.put("zookeeper.connect", zookeeper);
-        props.put("group.id", groupId);
+        props.put("group.id", cassandraGroupId);
         props.put("auto.offset.reset", consumerReset);
 
         return props;
@@ -134,14 +122,12 @@ public class KafkaConsumerService implements InitializingBean, DisposableBean {
         }
     }
 
-
-
     public void setZookeeper(String zookeeper) {
         this.zookeeper = zookeeper;
     }
 
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
+    public void setCassandraGroupId(String cassandraGroupId) {
+        this.cassandraGroupId = cassandraGroupId;
     }
 
     public void setConsumerReset(String consumerReset) {
